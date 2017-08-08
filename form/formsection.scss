@@ -1,0 +1,70 @@
+@import "./variables";
+
+.form-section-title {
+    font-size: 28px;
+    font-weight: normal;
+    color: #231F20;
+    margin:0px;
+    padding-top:12px;
+}
+.form-section-header {
+    font-size: 16px;
+    font-weight: normal;
+    margin-top: 5px;
+    margin-bottom: 8px;
+}
+.required {
+    font-size: 14px;
+    font-weight: normal;
+    color: #757575;
+    }
+.form-section-main {
+    background-color: #FFFFFF;
+    padding: 0px 60px 0px 60px;
+}
+.form-section-inner {
+    background-color: #FFFFFF;
+    border-width: 6px;
+    border-style: solid;
+    border-color: #FFFFFF;
+    border-radius: 5px;
+}
+.sections > form-section:last-of-type > .form-section-outer > .form-section-inner {
+    border-radius: 5px 5px 0px 0px;
+}
+.form-section-outer {
+    background-color: #E0E0E0;
+    border-width: 3px;
+    border-style: solid;
+    border-color: #E0E0E0;
+    border-bottom: #FFFFFF;
+    border-left: none;
+    border-right: none;
+}
+@media only screen and (min-device-width: $screen-sm-min) and (max-device-width: $screen-md-max) {
+    .form-section-outer {
+        border-width: 2px;
+    }
+     .form-section-main {
+     padding: 0px 20px 0px 20px;
+    }
+  }
+@media only screen and (min-device-width: $screen-smallest) and (max-device-width: $screen-xs-max) {
+    .form-section-title {
+        font-size: 23px;
+        padding-top:12px;
+    }
+    .form-section-outer {
+        border-width: 1px 0px 0px 0px;
+    }
+    .form-section-inner {
+        border-radius: 0px;
+    }
+     .form-section-main {
+     padding: 0px 20px 0px 20px;
+    }
+    
+    .sections > form-section:last-of-type > .form-section-outer > .form-section-inner {
+        border-radius: 0px;
+    }
+}

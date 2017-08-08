@@ -1,0 +1,37 @@
+<div class="question">
+	<div *ngIf="question.type == 'text' || question.type == 'email'" [hidden]="!displayQuestion">
+		<text-component [questiondata]="question" [sectionId]="sectionId" (formSubmissionQuestionData)="getResponse($event)"></text-component>
+	</div>
+
+	<div *ngIf="question.type == 'textarea'" [hidden]="!displayQuestion">
+		<textarea-component [questiondata]="question" [sectionId]="sectionId" (formSubmissionQuestionData)="getResponse($event)"></textarea-component>
+	</div>
+
+	<div *ngIf="question.type == 'radio'" [hidden]="!displayQuestion">
+		<radio-component [questiondata]="question" [sectionId]="sectionId" (formSubmissionQuestionData)="getResponse($event)"></radio-component>
+	</div>
+
+	<div *ngIf="question.type == 'date'" [hidden]="!displayQuestion">
+		<date-component [questiondata]="question" [sectionId]="sectionId" (formSubmissionQuestionData)="getResponse($event)"></date-component>
+	</div>
+
+	<div *ngIf="question.type == 'checkbox'" [hidden]="!displayQuestion">
+		<checkbox-component [questiondata]="question" [sectionId]="sectionId" (formSubmissionQuestionData)="getResponse($event)"></checkbox-component>
+	</div>
+	
+	<div *ngIf="question.type == 'info'">
+		<info-component [questiondata]="question"></info-component>
+	</div>
+	
+	<div *ngIf="question.type == 'dropdown'" [hidden]="!displayQuestion">
+		<dropdown-component [questiondata]="question" [sectionId]="sectionId" (formSubmissionQuestionData)="getResponse($event)"></dropdown-component>
+	</div>
+	
+	<div *ngIf="question.type == 'attachment'">
+		<attachment-component [questiondata]="question" [sectionId]="sectionId" (formSubmissionQuestionData)="getResponse($event)"></attachment-component>
+	</div>
+	
+	<div *ngIf="question.type == 'search'" [hidden]="!displayQuestion">
+		<search-component [questiondata]="question" [sectionId]="sectionId" (formSubmissionQuestionData)="getResponse($event)"></search-component>
+	</div>
+</div>

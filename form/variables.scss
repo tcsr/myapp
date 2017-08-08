@@ -1,0 +1,23 @@
+$primary: #005581;
+$accent: #2980B9;
+$light-accent: #55A7D6;
+$white: #ffffff;
+$danger: #a94442;;
+
+$screen-lg:                  1200px;
+$screen-lg-min:              $screen-lg;
+
+$screen-md:                  992px;
+$screen-md-min:              $screen-md;
+
+$screen-sm:                  768px;
+$screen-sm-min:              $screen-sm;
+
+$screen-xs:                  480px;
+$screen-xs-min:              $screen-xs;
+
+$screen-xs-max:              ($screen-sm-min - 1);
+$screen-sm-max:              ($screen-md-min - 1);
+$screen-md-max:              ($screen-lg-min - 1);
+
+$screen-smallest:             320px;

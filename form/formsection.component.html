@@ -1,0 +1,11 @@
+<div class="form-section-outer">
+	<div class="form-section-inner">
+		<div class="form-section-main">
+			<h1 class="form-section-title">{{section.title}}</h1>
+			<h3 class="form-section-header">{{section.header}}</h3>
+			<div class="questions">
+			<question *ngFor="let question of modifiedSection.questions" [question]="question" [sectionId]="section.formSectionCode" (formSubmissionResponseData)="getResponseData($event)"></question> 
+			</div>
+		</div>
+	</div>
+</div>

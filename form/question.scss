@@ -1,0 +1,120 @@
+@import "./variables";
+
+.question-label {
+    font-size: 18px;
+    font-weight: bold;
+    color: #231F20;
+}
+.radio-chkbx-label {
+    font-size: 16px;
+    font-weight: 300 !important;
+    color: #000000;
+}
+.text-danger {
+    color: #B71C1C;
+    font-size: 14px;
+    padding-bottom: 1px;
+    margin:1px;
+    position: absolute;
+}
+
+.asterix-space{
+    position:absolute;
+    margin-left:-10px;
+}
+
+.radio-space{
+    margin-top:1px;
+    margin-bottom:1px;
+}
+
+label {
+      margin-bottom:0px;
+}
+
+.checkbox{
+ margin-top: 3px !important;
+ margin-bottom:1px !important;
+}
+
+.dateComponent{
+	.calendar{
+		position:absolute;
+		z-index: 9999;
+	}
+}
+.drop-width{
+   width:250px;
+}
+
+.helptext {
+    display: inline-block;
+    height: 21px;
+    width: 21px;
+    line-height: 20px;
+    -moz-border-radius: 18px;
+    -webkit-border-radius: 18px;
+    border-radius: 18px;
+  
+    border-style: solid;
+    border-width: 2px;
+    border-color: #005581;
+    color: #005581;
+    text-align: center;
+    font-weight:bolder;
+    font-size: 0.8em;
+    font-family: Tahoma, Geneva, sans-serif;
+}
+
+.helptext:hover{
+ color:black;
+ border-color:black;
+}
+input[type="checkbox"]:focus { 
+ outline: 2px solid #ffa500;
+ box-shadow: 0px 0px 5px #ffa500; 
+ -moz-box-shadow: 0px 0px 5px #ffa500;
+ -webkit-box-shadow: 0px 0px 5px #ffa500;    
+}
+.file{
+ margin-top: 3px !important;
+ margin-bottom:30px !important;
+}
+.search{
+ margin-top: 5px !important;
+ margin-bottom:3px !important;
+ width:25%;
+}
+.show-list{
+ margin-top: 5px !important;
+ margin-bottom:5px !important;
+}
+.validation-text{
+ font-size: 14px;
+ padding-bottom: 1px;
+ margin:1px;
+ position: absolute;
+ color: #B71C1C;
+}
+.fixed-width{
+ float:left;
+ width: 240px;
+ white-space: pre;
+}
+@media only screen and (min-device-width: $screen-smallest) and (max-device-width: $screen-xs-max) {
+    .required-error {
+        font-size: 16px;
+    }
+    .search {
+	   width:100%;
+	}
+}
+
+@media only screen and (min-device-width: $screen-sm-min) and (max-device-width: $screen-md-max) {
+ .required-error {
+        font-size: 16px;
+    }
+    .search {
+	   width:100%;
+	}
+}

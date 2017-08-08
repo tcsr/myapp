@@ -1,0 +1,21 @@
+<div class="form">
+	<form [formGroup]="myForm" (ngSubmit)="submit(myForm)" novalidate>
+		<div class="heading">
+			<div>
+				<h1 class="form-title">{{form.title}}</h1>
+				<h3 class="form-header">{{form.header}}</h3>
+				<h4 class="required">{{requiredFieldStatement}}</h4>
+			</div>
+		</div>
+		<div class="sections">
+			<form-section *ngFor="let section of form.formSections" [section]="section" (formSectionsForRequest)="formSectionsForRequest($event)"></form-section>
+		</div>
+		<div class="form-buttons">
+			<div class="validation-messages">
+				<span *ngIf="errorMessage">{{errorMessage}}</span>
+			</div>
+			<button [disabled]="disableButton" type="submit" class="btn btn-primary  btn-space" *ngIf="!formSubCode">Submit</button>
+			<button type="button" class="btn btn-default  btn-space" *ngIf="!formSubCode">Cancel</button>
+		</div>
+	</form>
+</div>

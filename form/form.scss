@@ -1,0 +1,136 @@
+@import "./variables";
+body{
+ font-family: 'Roboto' !important;
+}
+
+
+.heading {
+    background-color: #0277BD;
+    color:white;
+    padding:10px 60px 10px 60px;
+    border-width: 3px;
+    border-style: solid;
+    border-color: #E0E0E0; 
+    border-bottom: 0px;
+    border-top: 0px;
+    border-radius: 5px;
+}
+.sections {
+    width:100%;
+}
+.survey{
+    padding:0;
+}
+.btn-space {
+    width: 170px;
+    margin: 7px;
+    font-size: larger;
+    font-weight:bold;
+    height: 35px;
+}
+.btn-primary{
+background-color: #0277BD;
+border-color: #0277BD;
+}
+.form-header {
+    font-size: 16px;
+    font-weight: normal;
+}
+.form-title {
+    font-size: 36px;
+    font-weight: normal;
+    color: #FFFFFF;
+}
+.form-buttons {
+    background-color: white;
+    border-width: 3px;
+    border-style: solid;
+    border-color: #E0E0E0;
+    border-top: #FFFFFF;
+    text-align: left;
+    padding-left: 57px;
+    padding-bottom: 20px;
+    border-left: none;
+    border-right: none;
+}
+.validation-messages{
+	padding:0px 60px 0px 10px;
+	color:#B71C1C; 
+	position:relative;  
+}
+.required {
+    font-size: 14px;
+    font-weight: bold;
+    color: #FFFFFF;
+}  
+@media only screen and (min-device-width: $screen-sm-min) and (max-device-width: $screen-md-max) {
+    .heading {
+        background-color: #ECEFF1;
+        border-width: 0px;
+        border-style:none;
+        padding:10px 20px 10px 20px;
+    }
+    .form-title {
+        color: #000000;
+    }
+    .form-header {
+        color: #000000;
+    }
+    .form-buttons {
+        border-width: 2px;
+        padding-left: 20px;
+    }
+   
+   .form-container
+   {
+     width:100%;
+   }
+   .required {
+     color: #000000;
+    }   
+}
+@media only screen and (min-device-width: $screen-smallest) and (max-device-width: $screen-xs-max) {
+    .heading {
+        background-color: #ECEFF1;
+        border-width: 0px;
+        border-style:none;
+        padding:10px 20px 10px 20px;
+    }
+    .form-title {
+        font-size: 28px;
+        color: #000000;
+    }
+    .form-header {
+        color: #000000;
+    }
+    
+    .form-buttons {
+        border-width: 0px;
+        padding-left: 20px;
+    }
+   .form-container
+   {
+     width:100%;
+   }
+   .required {
+     color: #000000;
+    }   
+   
+  }
+
+
+@media only screen and (min-device-width :  $screen-smallest) and (max-device-width : 414px) {
+.btn-space{
+     text-align:center;
+      min-width: 55%;
+    }
+  .form-buttons {
+	text-align: center;
+    padding-left: 0px;
+    padding-bottom: 20px;
+}
+}
+
+
+
+
