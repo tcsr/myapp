@@ -29,6 +29,29 @@
         </ngx-datatable>
       </div>
 
+
+     <table class="table table-bordered table-condensed"> 
+        <thead>
+          <tr>
+            <th>
+              <input type="checkbox" />
+            </th>
+            <th  *ngFor="let clmn of columns">
+              {{clmn.prop}}
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of rows">
+            <td><input type="checkbox" /></td>
+           <td *ngFor="let col of columns" >{{ col.prop }}{{row + [policyno]}}</td>    
+           <!-- col :{ "prop": "policyno" }   -->
+          </tr>
+        </tbody>
+      </table>
+
+
+
 import { Component, OnInit } from '@angular/core';
 
 @Component({
