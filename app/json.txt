@@ -1,0 +1,18 @@
+{
+  "dynamicFileds": [
+    {
+      "panelConfig": {
+        "panel_01": {
+          "one": "one"
+        },
+        "panel_02": "two",
+        "panel_03": "three"
+      },
+      "panelDetails": [
+        {
+          "one": "one"
+        }
+      ]
+    }
+  ]
+}
