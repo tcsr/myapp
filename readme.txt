@@ -17,8 +17,9 @@ import { HeaderComponent } from './header/header.component';
 import { TableComponent } from './table/table.component';
 
 const routes: Routes = [
-  { path: '', component: HeaderComponent },
-  { path: 'about', component: TableComponent }
+    { path: '', redirectTo: '/home', pathMatch: 'full' },
+    { path: 'home', component: HeaderComponent },
+    { path: 'about', component: TableComponent }
 ];
 
 export const appRouterModule = RouterModule.forRoot(routes);
