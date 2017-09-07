@@ -197,3 +197,355 @@ this.panelData = {
         }
       ]
     };
+===============================================================
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { DgitService } from './../../services/dgit.service';
+import { Observable } from 'rxjs/Observable';
+
+@Component({
+  selector: 'panel-component',
+  templateUrl: './panel.component.html'
+})
+export class PanelComponent implements OnInit {
+
+  panelData: any;
+  result: any;
+  dynamicData: any;
+
+
+  panelArray: any = [];
+  panelKeys: any;
+  filteredPanelArray: any = [];
+ matchedPanel: any = {};
+
+  constructor(private _dgitService: DgitService) {
+    this._dgitService.getData()
+      .subscribe(data => {
+        this.result = data;
+      })
+   // console.log(this.result);
+  }
+
+  ngOnInit() {
+
+    this.panelData = {
+      "panelData": [
+        {
+          "TITLE": "DGiT-Health Data Fabrication",
+          "PANEL_ORDER": "1",
+          "COMP_PER_ROW": "2",
+          "PANEL_TYPE": "PANEL",
+          "HAS_BORDER": "YES",
+          "PANEL_CONTENT": [
+            {
+              type: 'dropdown',
+              label: 'Type of Product',
+              compWidth: 60,
+              order: 1,
+              required: true,
+              dropdownData: [
+                { value: 'HI', displayText: 'Hospital Income' },
+                { value: 'LGC', displayText: 'Long Term Care' },
+                { value: 'MS', displayText: 'Medicare Supplement' },
+                { value: 'SDI', displayText: 'Short Term Disability Income' },
+                { value: 'DII', displayText: 'Disability Income(Issued Age)' },
+                { value: 'DSA', displayText: 'Disability Income(Attained Age)' },
+                { value: 'SPS', displayText: 'System and policy details' }
+              ]
+            }
+            ,
+            {
+              type: 'date',
+              label: 'Effective Date',
+              compWidth: 30,
+              order: 4,
+              required: true
+            },
+            {
+              type: 'empty',
+              label: '',
+              compWidth: "",
+              order: 2,
+              required: false
+            }
+            ,
+            {
+              type: 'dropdown',
+              label: 'State',
+              compWidth: 40,
+              order: 3,
+              required: true,
+              dropdownData: [
+                { value: '05', displayText: 'California - 05' },
+              ]
+            }
+          ]
+        },
+        {
+          "TITLE": "",
+          "PANEL_ORDER": "2",
+          "COMP_PER_ROW": "3",
+          "PANEL_TYPE": "PANEL",
+          "HAS_BORDER": "NO",
+          "PANEL_CONTENT": ""
+        },
+        {
+          "TITLE": "",
+          "PANEL_ORDER": "3",
+          "COMP_PER_ROW": "2",
+          "PANEL_TYPE": "BTN_PANEL",
+          "HAS_BORDER": "NO",
+          "PANEL_CONTENT": [
+            {
+              type: 'button',
+              label: 'Fabricate',
+              order: 5,
+              onClick: 'doFabrication()'
+            },
+            {
+              type: 'button',
+              label: 'Reset',
+              order: 6,
+              onClick: 'reset()'
+            }
+          ]
+        }
+      ]
+    };
+
+
+    this.dynamicData = {
+      "dynamicFields": {
+        "PANEL_DETAILS": [
+          { "NXT_SCRN_SEQ": "", "COMP_DATA": "", "COMP_TYPE": "Label", "COMP_STATE": "E", "COMP_NAME": "", "SCRN_SEQ": "0.00", "SCR_LOC": "Banner", "COMP_LABL": "" },
+          { "NXT_SCRN_SEQ": "", "COMP_DATA": "", "COMP_TYPE": "Image", "COMP_STATE": "E", "COMP_NAME": "", "SCRN_SEQ": "0.00", "SCR_LOC": "Banner", "COMP_LABL": "" },
+          { "NXT_SCRN_SEQ": "", "COMP_DATA": "", "COMP_TYPE": "Label", "COMP_STATE": "E", "COMP_NAME": "", "SCRN_SEQ": "0.00", "SCR_LOC": "Banner", "COMP_LABL": "" },
+          { "NXT_SCRN_SEQ": "", "COMP_DATA": "", "COMP_TYPE": "Label", "COMP_STATE": "E", "COMP_NAME": "user", "SCRN_SEQ": "0.00", "SCR_LOC": "Banner", "COMP_LABL": "" },
+          { "NXT_SCRN_SEQ": "", "COMP_DATA": "", "COMP_TYPE": "Image", "COMP_STATE": "E", "COMP_NAME": "home", "SCRN_SEQ": "0.00", "SCR_LOC": "Banner", "COMP_LABL": "" },
+          { "NXT_SCRN_SEQ": "", "COMP_DATA": "", "COMP_TYPE": "Image", "COMP_STATE": "E", "COMP_NAME": "logout", "SCRN_SEQ": "0.00", "SCR_LOC": "Banner", "COMP_LABL": "" },
+          { "NXT_SCRN_SEQ": "", "COMP_DATA": "", "COMP_TYPE": "ENV_LINK", "COMP_STATE": "E", "COMP_NAME": "StateCd", "SCRN_SEQ": "0.00", "SCR_LOC": "PANEL_01", "COMP_LABL": "Selected Environment :" },
+
+          { "NXT_SCRN_SEQ": "0", "COMP_DATA": "0", "COMP_TYPE": "Menu", "COMP_STATE": "E", "COMP_NAME": "Menu_1", "SCRN_SEQ": "0.00", "SCR_LOC": "PANEL_03", "COMP_LABL": "Fabricate" },
+          { "NXT_SCRN_SEQ": "1", "COMP_DATA": "1", "COMP_TYPE": "Menu", "COMP_STATE": "E", "COMP_NAME": "Menu_2", "SCRN_SEQ": "0.00", "SCR_LOC": "PANEL_03", "COMP_LABL": "Review Data" },
+
+          {
+            "NXT_SCRN_SEQ": {
+              "DISABILITY INCOME(ATTAINED AGE)": "6",
+              "SYSTEM AND POLICY DETAILS": "7",
+              "SHORT TERM DISABILITY INCOME": "4",
+              "MEDICARE SUPPLEMENT": "3",
+              "HOSPITAL INCOME": "1",
+              "DISABILITY INCOME(ISSUED AGE)": "5",
+              "SELECT": "X", "LONG TERM CARE": "2"
+            },
+            "COMP_DATA": [
+              {
+                "VALUE": "Hospital Income",
+                "DISPLAY": "Hospital Income"
+              },
+              {
+                "VALUE": "LGC",
+                "DISPLAY": "Long Term Care"
+              },
+              {
+                "VALUE": "MS",
+                "DISPLAY": "Medicare Supplement"
+              },
+              {
+                "VALUE": "SDI",
+                "DISPLAY": "Short Term Disability Income"
+              },
+              {
+                "VALUE": "DII",
+                "DISPLAY": "Disability Income(Issued Age)"
+              },
+              {
+                "VALUE": "DSA",
+                "DISPLAY": "Disability Income(Attained Age)"
+              },
+              {
+                "VALUE": "SPS",
+                "DISPLAY": "System and policy details"
+              }
+            ],
+            "COMP_TYPE": "Drop_Down",
+            "COMP_STATE": "E",
+            "COMP_NAME": "PROD_TYPE",
+            "SCRN_SEQ": "0.00",
+            "SCR_LOC": "PANEL_04",
+            "COMP_LABL": "Type of Product *"
+          },
+          { "NXT_SCRN_SEQ": "", "COMP_DATA": "", "COMP_TYPE": "Text_Box", "COMP_STATE": "E", "COMP_NAME": "N_F_PLC", "SCRN_SEQ": "0.00", "SCR_LOC": "PANEL_04", "COMP_LABL": "Number of Policies *" },
+          { "NXT_SCRN_SEQ": "", "COMP_DATA": [{ "VALUE": "California - 05", "DISPLAY": "California - 05" }], "COMP_TYPE": "Drop_Down", "COMP_STATE": "E", "COMP_NAME": "State", "SCRN_SEQ": "0.00", "SCR_LOC": "PANEL_04", "COMP_LABL": "State*" },
+          { "NXT_SCRN_SEQ": "", "COMP_DATA": "", "COMP_TYPE": "Date_Picker", "COMP_STATE": "E", "COMP_NAME": "fab_date", "SCRN_SEQ": "0.00", "SCR_LOC": "PANEL_04", "COMP_LABL": "Effective Date*" },
+          { "NXT_SCRN_SEQ": "", "COMP_DATA": "", "COMP_TYPE": "Button", "COMP_STATE": "", "COMP_NAME": "fab_fab_btn", "SCRN_SEQ": "0.00", "SCR_LOC": "PANEL_05", "COMP_LABL": "Fabrication" },
+          { "NXT_SCRN_SEQ": "", "COMP_DATA": "", "COMP_TYPE": "Button", "COMP_STATE": "", "COMP_NAME": "fab_reset_btn", "SCRN_SEQ": "0.00", "SCR_LOC": "PANEL_05", "COMP_LABL": "Review" }
+        ],
+        "PANEL_CONFIG": [
+          {
+            "PANEL_05": {
+              "PANEL_ORDER": "5",
+              "COMP_TYPE": "Button_Panel",
+              "COMP_NAME": "PANEL_05",
+              "HAS_BORDER": "NO",
+              "SCR_LOC": "PANEL_04",
+              "COMP_ALIGN": "CN",
+              "COMP_PER_ROW": "2",
+              "TITLE": "DGiT-Health Data Fabrication"
+            },
+            "PANEL_02": {
+              "PANEL_ORDER": "2",
+              "COMP_TYPE": "Panel",
+              "COMP_NAME": "PANEL_02",
+              "HAS_BORDER": "NO",
+              "SCR_LOC": "",
+              "COMP_ALIGN": "LR",
+              "COMP_PER_ROW": "2",
+              "TITLE": ""
+            },
+            "PANEL_01": {
+              "PANEL_ORDER": "1",
+              "COMP_TYPE": "Panel",
+              "COMP_NAME": "PANEL_01",
+              "HAS_BORDER": "NO",
+              "SCR_LOC": "",
+              "COMP_ALIGN": "LR",
+              "COMP_PER_ROW": "1",
+              "TITLE": ""
+            },
+            "PANEL_04": {
+              "PANEL_ORDER": "4",
+              "COMP_TYPE": "Panel",
+              "COMP_NAME": "PANEL_04",
+              "HAS_BORDER": "YES",
+              "SCR_LOC": "",
+              "COMP_ALIGN": "LR",
+              "COMP_PER_ROW": "2",
+              "TITLE": "DGiT-Health Data Fabrication"
+            },
+            "PANEL_03": {
+              "PANEL_ORDER": "3",
+              "COMP_TYPE": "Panel",
+              "COMP_NAME": "PANEL_03",
+              "HAS_BORDER": "NO",
+              "SCR_LOC": "PANEL_02",
+              "COMP_ALIGN": "LR",
+              "COMP_PER_ROW": "1", "TITLE": ""
+            }
+          }
+        ]
+      }
+    };
+
+    console.log(this.dynamicData);
+
+    this.dynamicData['dynamicFields'].PANEL_CONFIG.forEach(element => {
+      this.panelKeys = Object.keys(element);
+       console.log(this.panelKeys);
+    });
+
+    this.dynamicData["dynamicFields"].PANEL_DETAILS.forEach(fields => {
+      this.panelKeys.forEach(panelElement => {
+        if (fields.SCR_LOC == panelElement) {
+
+         
+          this.matchedPanel[panelElement] = fields;
+          this.panelArray.push(this.matchedPanel);
+         // console.log(this.matchedPanel);
+        }
+      });
+    });
+    console.log(this.matchedPanel);
+  }
+
+
+  onSelectionChanged(result: any) {
+    console.log(result);
+
+    this.panelData = {
+      "panelData": [
+        {
+          "TITLE": "DGiT-Health Data Fabrication",
+          "PANEL_ORDER": "1",
+          "COMP_PER_ROW": "2",
+          "PANEL_TYPE": "PANEL",
+          "HAS_BORDER": "YES",
+          "PANEL_CONTENT": [
+            {
+              type: 'dropdown',
+              label: 'Type of Product',
+              compWidth: 60,
+              order: 1,
+              required: true,
+              dropdownData: [
+                { value: 'HI', displayText: 'Hospital Income' },
+                { value: 'LGC', displayText: 'Long Term Care' },
+                { value: 'MS', displayText: 'Medicare Supplement' },
+                { value: 'SDI', displayText: 'Short Term Disability Income' },
+                { value: 'DII', displayText: 'Disability Income(Issued Age)' },
+                { value: 'DSA', displayText: 'Disability Income(Attained Age)' },
+                { value: 'SPS', displayText: 'System and policy details' }
+              ]
+            }
+            ,
+            {
+              type: 'date',
+              label: 'Effective Date',
+              compWidth: 30,
+              order: 4,
+              required: true
+            },
+            {
+              type: 'textbox',
+              label: 'Number of Policies',
+              compWidth: 30,
+              order: 2,
+              required: true
+            }
+            ,
+            {
+              type: 'dropdown',
+              label: 'State',
+              compWidth: 40,
+              order: 3,
+              required: true,
+              dropdownData: [
+                { value: '05', displayText: 'California - 05' },
+              ]
+            }
+          ]
+        },
+        {
+          "TITLE": "",
+          "PANEL_ORDER": "2",
+          "COMP_PER_ROW": "3",
+          "PANEL_TYPE": "PANEL",
+          "HAS_BORDER": "NO",
+          "PANEL_CONTENT": ""
+        },
+        {
+          "TITLE": "",
+          "PANEL_ORDER": "3",
+          "COMP_PER_ROW": "2",
+          "PANEL_TYPE": "BTN_PANEL",
+          "HAS_BORDER": "NO",
+          "PANEL_CONTENT": [
+            {
+              type: 'button',
+              label: 'Fabricate',
+              order: 5,
+              onClick: 'doFabrication'
+            },
+            {
+              type: 'button',
+              label: 'Reset',
+              order: 6,
+              onClick: 'reset'
+            }
+          ]
+        }
+      ]
+    };
+  }
+
+}
