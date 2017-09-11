@@ -1,4 +1,17 @@
 Welcome to MyApp
+
+https://stackoverflow.com/questions/40567687/angular-2-insert-a-component-into-the-dom-of-another-component
+
+http://plnkr.co/edit/7jJJhkcgqk4YdjFOXTGF?p=preview
+
+https://plnkr.co/edit/JHpIHR43SvJd0OxJVMfV?p=preview
+
+1. The ViewContainerRef
+
+https://blog.angularindepth.com/exploring-angular-dom-abstractions-80b3ebcfc02
+
+https://dzone.com/articles/building-angular-2-components-on-the-fly-a-dialog
+
 https://jsfiddle.net/udaii/6ssjo51g/#&togetherjs=n5dFm1qG6t
 
 
