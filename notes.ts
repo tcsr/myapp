@@ -27,3 +27,32 @@ this.dynamicData['dynamicFields'].PANEL_CONFIG.forEach(element => {
       }
     });
     console.log(this.pd);
+
+-------------------------------------------------------------------------------------------------
+updateIteration(){   
+    let iterations= [];
+       if(this.selected){          
+            this.selected.forEach((elem,index) =>{          
+                iterations.push({
+                    iteration: index + 1,
+                    response: elem.value,
+                    responseMetadata:{
+                        allowedResponses:[],
+                        chosenResponses:[elem]
+                    }
+            });
+            });  
+        }   
+        if(this.selected.length == 0){
+            iterations.push({
+                iteration:0,
+                response:"",
+                responseMetadata:{
+                    allowedResponses:[],
+                    chosenResponses:[]
+                }
+            });
+        }
+        this.controlObject.value.iterations = iterations;       
+    }
+---------------------------------------------------------------------------------------------------
