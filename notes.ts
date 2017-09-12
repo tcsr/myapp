@@ -18,13 +18,12 @@ this.dynamicData['dynamicFields'].PANEL_CONFIG.forEach(element => {
 
       if (this.panelKeys.includes(fields.SCR_LOC)) {   //this.panelKeys.indexOf(fields.SCR_LOC) > -1
         let panel = fields.SCR_LOC;
-        
         let panels = this.dynamicData['dynamicFields'].PANEL_CONFIG[0][panel];
+        panels["PANEL_CONTENT"] = fields;
         this.pd.push(panels);
         // this.matchedPanel[panelElement] = fields;
         this.panelArray.push(fields);
         // console.log(this.matchedPanel);
       }
-
     });
     console.log(this.pd);
