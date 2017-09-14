@@ -98,4 +98,278 @@ updateIteration(){
 
 
 ------------------------------------------------------------------
+ http://plnkr.co/edit/e1SxsnrxrW6adoHotai9?p=preview
+
+import {Component} from 'angular2/core';
+import {PanelView} from './tree-view.component';
+
+@Component({
+	selector: 'my-app',
+	directives: [PanelView],
+	template: `
+	<h1>Nested Panels</h1>
+	<panel-view [panelData]='dynamicData'></panel-view>
+	`
+})
+export class AppComponent { 
+  dynamicData = [
+    {
+      "PANEL_TYPE": "Panel",
+      "PANEL_ORDER": "2",
+      "PANEL_CONTENT": [
+        {
+          "NESTED_PANELS": [
+            {
+              "PANEL_ORDER": "4",
+              "PANEL_TYPE": "Panel",
+              "PANEL_CONTENT": [
+                {
+                  "NESTED_PANELS": [
+                    {
+                      "PANEL_TYPE": "Button_Panel",
+                      "PANEL_ORDER": "5",
+                      "PANEL_CONTENT": [
+                        {
+                          "NESTED_PANELS": []
+                        },
+                        {
+                          "COMPNT_VAL": "",
+                          "NXT_SCRN_SEQ": "0.1",
+                          "COMP_DATA": "0.1",
+                          "ORDER": "1",
+                          "COMP_TYPE": "Button",
+                          "COMP_STATE": "",
+                          "COMP_NAME": "fab_fab_btn",
+                          "SCRN_SEQ": "0.00",
+                          "SCR_LOC": "BTN_PANEL_01",
+                          "COMP_LABL": "Fabrication"
+                        },
+                        {
+                          "COMPNT_VAL": "",
+                          "NXT_SCRN_SEQ": "",
+                          "COMP_DATA": "",
+                          "ORDER": "2",
+                          "COMP_TYPE": "Button",
+                          "COMP_STATE": "",
+                          "COMP_NAME": "fab_reset_btn",
+                          "SCRN_SEQ": "0.00",
+                          "SCR_LOC": "BTN_PANEL_01",
+                          "COMP_LABL": "Review"
+                        }
+                      ],
+                      "SCR_LOC": "PANEL_04",
+                      "HAS_BORDER": "NO",
+                      "PANEL_TITLE": "DGiT-Health Data Fabrication",
+                      "PANEL_ID": "BTN_PANEL_01",
+                      "COMP_PER_ROW": "2"
+                    }
+                  ]
+                },
+                {
+                  "NXT_SCRN_SEQ": {
+                    "DISABILITY INCOME(ATTAINED AGE)": "6",
+                    "MEDICARE SUPPLEMENT": "3",
+                    "SHORT TERM DISABILITY INCOME": "4",
+                    "SYSTEM AND POLICY DETAILS": "7",
+                    "HOSPITAL INCOME": "1",
+                    "DISABILITY INCOME(ISSUED AGE)": "5",
+                    "SELECT": "X",
+                    "LONG TERM CARE": "2"
+                  },
+                  "COMP_DATA": [
+                    {
+                      "VALUE": "SELECT",
+                      "DISPLAY": "SELECT"
+                    },
+                    {
+                      "VALUE": "HOSPITAL INCOME",
+                      "DISPLAY": "HOSPITAL INCOME"
+                    },
+                    {
+                      "VALUE": "LONG TERM CARE",
+                      "DISPLAY": "LONG TERM CARE"
+                    },
+                    {
+                      "VALUE": "MEDICARE SUPPLEMENT",
+                      "DISPLAY": "MEDICARE SUPPLEMENT"
+                    },
+                    {
+                      "VALUE": "SHORT TERM DISABILITY INCOME",
+                      "DISPLAY": "SHORT TERM DISABILITY INCOME"
+                    },
+                    {
+                      "VALUE": "DISABILITY INCOME(ISSUED AGE)",
+                      "DISPLAY": "DISABILITY INCOME(ISSUED AGE)"
+                    },
+                    {
+                      "VALUE": "DISABILITY INCOME(ATTAINED AGE)",
+                      "DISPLAY": "DISABILITY INCOME(ATTAINED AGE)"
+                    },
+                    {
+                      "VALUE": "SYSTEM AND POLICY DETAILS",
+                      "DISPLAY": "SYSTEM AND POLICY DETAILS"
+                    }
+                  ],
+                  "REQUIRED": "true",
+                  "COMP_TYPE": "Drop_Down",
+                  "ORDER": "1",
+                  "COMP_NAME": "PROD_TYPE",
+                  "COMP_STATE": "E",
+                  "SCR_LOC": "PANEL_04",
+                  "SCRN_SEQ": "0.00",
+                  "COMP_LABL": "Type of Product *"
+                },
+                {
+                  "COMPNT_VAL": "",
+                  "NXT_SCRN_SEQ": "",
+                  "COMP_DATA": "",
+                  "REQUIRED": "true",
+                  "COMP_TYPE": "Text_Box",
+                  "ORDER": "2",
+                  "COMP_NAME": "N_F_PLC",
+                  "COMP_STATE": "E",
+                  "SCR_LOC": "PANEL_04",
+                  "SCRN_SEQ": "0.00",
+                  "COMP_LABL": "Number of Policies *"
+                },
+                {
+                  "NXT_SCRN_SEQ": {
+                    "California - 05": ""
+                  },
+                  "COMP_DATA": [
+                    {
+                      "VALUE": "California - 05",
+                      "DISPLAY": "California - 05"
+                    }
+                  ],
+                  "REQUIRED": "true",
+                  "COMP_TYPE": "Drop_Down",
+                  "ORDER": "3",
+                  "COMP_NAME": "State",
+                  "COMP_STATE": "E",
+                  "SCR_LOC": "PANEL_04",
+                  "SCRN_SEQ": "0.00",
+                  "COMP_LABL": "State*"
+                },
+                {
+                  "COMPNT_VAL": "",
+                  "NXT_SCRN_SEQ": "",
+                  "COMP_DATA": "",
+                  "REQUIRED": "true",
+                  "COMP_TYPE": "Date_Picker",
+                  "ORDER": "4",
+                  "COMP_NAME": "fab_date",
+                  "COMP_STATE": "E",
+                  "SCR_LOC": "PANEL_04",
+                  "SCRN_SEQ": "0.00",
+                  "COMP_LABL": "Effective Date*"
+                }
+              ],
+              "PANEL_TITLE": "DGiT-Health Data Fabrication",
+              "HAS_BORDER": "YES",
+              "SCR_LOC": "PANEL_02",
+              "PANEL_ID": "PANEL_04",
+              "COMP_PER_ROW": "2"
+            },
+            {
+              "PANEL_ORDER": "3",
+              "PANEL_TYPE": "Panel",
+              "PANEL_CONTENT": [
+                {
+                  "NESTED_PANELS": []
+                },
+                {
+                  "COMPNT_VAL": "",
+                  "NXT_SCRN_SEQ": "0",
+                  "COMP_DATA": "0",
+                  "COMP_TYPE": "Menu",
+                  "COMP_NAME": "Menu_1",
+                  "COMP_STATE": "E",
+                  "SCR_LOC": "PANEL_03",
+                  "SCRN_SEQ": "0.00",
+                  "COMP_LABL": "Fabricate"
+                },
+                {
+                  "COMPNT_VAL": "",
+                  "NXT_SCRN_SEQ": "1",
+                  "COMP_DATA": "1",
+                  "COMP_TYPE": "Menu",
+                  "COMP_NAME": "Menu_2",
+                  "COMP_STATE": "E",
+                  "SCR_LOC": "PANEL_03",
+                  "SCRN_SEQ": "0.00",
+                  "COMP_LABL": "Review Data"
+                }
+              ],
+              "PANEL_TITLE": "",
+              "HAS_BORDER": "NO",
+              "SCR_LOC": "PANEL_02",
+              "PANEL_ID": "PANEL_03",
+              "COMP_PER_ROW": "1"
+            }
+          ]
+        }
+      ],
+      "SCR_LOC": "",
+      "HAS_BORDER": "NO",
+      "PANEL_TITLE": "",
+      "PANEL_ID": "PANEL_02",
+      "COMP_PER_ROW": "2"
+    },
+    {
+      "PANEL_TYPE": "Panel",
+      "PANEL_ORDER": "1",
+      "PANEL_CONTENT": [
+        {
+          "NESTED_PANELS": []
+        },
+        {
+          "COMPNT_VAL": "Project - R20784, R02 - TCWD/IMSH1/WGB/DDFHW0D. Haplex: WZG/DDFHW0C. ROFI: NEWB. LANE: GROUP4-WZG",
+          "NXT_SCRN_SEQ": "",
+          "COMP_DATA": "",
+          "COMP_TYPE": "ENV_LINK",
+          "COMP_STATE": "E",
+          "COMP_NAME": "StateCd",
+          "SCRN_SEQ": "0.00",
+          "SCR_LOC": "PANEL_01",
+          "COMP_LABL": "Selected Environment :"
+        }
+      ],
+      "SCR_LOC": "",
+      "HAS_BORDER": "NO",
+      "PANEL_TITLE": "",
+      "PANEL_ID": "PANEL_01",
+      "COMP_PER_ROW": "1"
+    }
+  ];
+}
+
+/*
+Copyright 2016 Google Inc. All Rights Reserved.
+Use of this source code is governed by an MIT-style license that
+can be found in the LICENSE file at http://angular.io/license
+*/
+-------------------------------------------------------------------------------------------
+import {Component, Input} from 'angular2/core';
+
+@Component ({
+  selector: 'panel-view',
+  directives: [PanelView],
+  template: `
+  <div>
+    <div *ngFor="#panel of panelData">
+      <div>
+        {{panel.PANEL_TYPE}}
+        {{panel.PANEL_ORDER}}
+        {{panel.COMPNT_VAL}}
+      </div>
+      <panel-view [panelData]="panel.PANEL_CONTENT"></panel-view>
+      <br>
+    </div>
+</div>
+  `
+})
+export class PanelView {
+  @Input() panelData: [];
+}
   
