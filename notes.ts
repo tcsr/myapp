@@ -56,6 +56,31 @@ updateIteration(){
         this.controlObject.value.iterations = iterations;       
     }
 ---------------------------------------------------------------------------------------------------
+
+  GetPositions(): Observable<any> {
+    const url1 = 'http://localhost:1944/api/job/GetPositions';
+    const url = 'assets/dynamic.json';
+    return this.http.get(url).map(
+      (res) => {
+        const data = res.json();
+       // console.log(data);
+        return data;
+      }
+    )
+  }
+  
+  loadPositions() {
+    return this.empService.GetPositions().subscribe(data => {
+      this.dynamicData = data;
+    },
+      error => {
+        console.log(error)
+      });
+  }
+  
+  
+  
+---------------------------------------------------------------------------------------------------
   
   //// First set - JSON
 
