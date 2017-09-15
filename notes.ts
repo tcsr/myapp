@@ -373,3 +373,15 @@ export class PanelView {
   @Input() panelData: [];
 }
   
+--------------------------------------------------
+<div *ngFor="let pd of dynamicData | orderby: 'PANEL_ORDER'">
+  {{pd | json}}
+  <br><br><br>
+  <div *ngFor="let pc of pd.PANEL_CONTENT">
+    <div *ngIf="pc.NESTED_PANELS?.length > 0">
+      <panel-component [dynamicData]="pc.NESTED_PANELS"></panel-component>
+    </div>
+    PC:{{pc | json}}
+    <br><br><br>
+  </div>
+</div>
