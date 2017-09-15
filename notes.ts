@@ -409,3 +409,69 @@ import {Component, Input} from 'angular2/core';
 export class TreeView {
   @Input() treeData: [];
 }
+======
+	<div *ngFor="let panel of dynamicData " class="row col-md-12">
+  <!-- <pre>   {{panel |json}}  </pre> -->
+
+  <!-- <pre>{{panel | json}}</pre> -->
+
+  <div *ngFor="let panelval of panel.PANEL_CONTENT" style="margin-left:10px;" [ngClass]="{'col-md-12': panel.COMP_PER_ROW == 1,'col-md-6': panel.COMP_PER_ROW == 2, 'col-md-4': panel.COMP_PER_ROW == 3, 'col-md-3': panel.COMP_PER_ROW == 4}"
+  class="comp-space">
+
+    <!-- <div *ngIf="panel.PANEL_TYPE == 'Panel'" > -->
+      <!-- <pre> {{panelval | json}} </pre> -->
+      <div [ngSwitch]="panelval.COMP_TYPE">
+          <div *ngSwitchCase="'Text_Box'" [style.width.%]="panelval.compWidth">
+            <textbox-component [dynamicData]="panelval"></textbox-component>
+          </div>
+          <div *ngSwitchCase="'textarea'" [style.width.%]="panelval.compWidth">
+            <textarea-component [dynamicData]="panelval"></textarea-component>
+          </div>
+          <div *ngSwitchCase="'radio'">
+            <radio-component [dynamicData]="panelval"></radio-component>
+          </div>
+          <div *ngSwitchCase="'Date_Picker'" [style.width.%]="panelval.compWidth">
+            <date-component [dynamicData]="panelval"></date-component>
+          </div>
+          <div *ngSwitchCase="'checkbox'">
+            <checkbox-component [dynamicData]="panelval"></checkbox-component>
+          </div>
+          <div *ngSwitchCase="'Drop_Down'" [style.width.%]="panelval.compWidth">
+            <dropdown-component [dynamicData]="panelval"></dropdown-component>
+          </div>
+          <div *ngSwitchCase="'label'" [style.width.%]="panelval.compWidth">
+            <label-component [dynamicData]="panelval"></label-component>
+          </div>
+          <div *ngSwitchCase="'empty'" [style.width.%]="panelval.compWidth">
+            <empty-component></empty-component>
+          </div>
+        </div>
+    <!-- </div> -->
+        
+    <div *ngIf="panel.PANEL_TYPE == 'Button_Panel' && panelval.COMP_LABL">
+        <!-- <pre> {{panelval | json}} </pre> -->
+        <button-component [dynamicData]="panelval"></button-component>
+    </div>
+
+
+    <div>
+      <div *ngIf="panelval.COMP_TYPE=='ENV_LINK'" class="row">
+        <div class="col-md-9">
+          <div style="margin: 8px 0;">
+            <envLink-Component [envLinkData]="panelval"></envLink-Component>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-3" *ngIf="panelval.COMP_TYPE=='Menu'">
+        <menu-component [menuData]='panelval'></menu-component>
+      </div>
+
+      <!-- <div *ngIf="panelval.COMP_LABL && panelval.COMP_TYPE!='Menu'">
+        {{panelval.COMP_LABL}}
+      </div> -->
+    </div>
+
+    <panel-component [dynamicData]="panelval.NESTED_PANELS"></panel-component>
+  </div>
+</div>
