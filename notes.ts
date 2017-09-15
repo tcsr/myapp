@@ -385,3 +385,27 @@ export class PanelView {
     <br><br><br>
   </div>
 </div>
+
+----------------------------------
+import {Component, Input} from 'angular2/core';
+
+@Component ({
+  selector: 'tree-view',
+  directives: [TreeView],
+  template: `
+  <ul>
+    <li *ngFor="#node of treeData">
+      {{node.PANEL_ID}}
+      <ul>
+      <li *ngFor="#nodeval of node.PANEL_CONTENT">
+      {{ nodeval.COMP_NAME }}
+      <tree-view [treeData]="nodeval.NESTED_PANELS"></tree-view>
+      </li>
+      </ul>
+    </li>
+</ul>
+  `
+})
+export class TreeView {
+  @Input() treeData: [];
+}
