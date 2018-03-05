@@ -23,3 +23,16 @@
       }
     )
   }
+
+ --------------------------------------------------------------
+ var jobPostingData = $scope.job;
+ transformRequest: function (data) {
+                    var formData = new FormData();
+                    formData.append("jobpostingdata", angular.toJson(data.jobpostingdata));
+                    for (var i = 0; i < data.files.length; i++) {
+                        formData.append("file" + i, data.files[i]);
+                    }
+                    return formData;
+                }
+   data: { jobpostingdata: jobPostingData, files: $scope.files }
+-----------------------------------------------------------------
