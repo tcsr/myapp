@@ -153,6 +153,38 @@ Usage:
 -------------------------------------------------------------------
  
  
+  <form [formGroup]="myForm">
+      <label for="name">Name</label>
+      <input formControlName="name" id="name" class=" from-control" />
+      <label for="email">Email</label>
+      <input formControlName="email" id="email" />
+      <span *ngIf="myForm?.controls?.email?.errors?.required" style="color: red;">
+        Required
+      </span>
+      <span *ngIf="myForm?.controls?.email?.errors?.email" style="color: red;">
+        Enter Valid Email
+      </span>
+      <label for="profile">Profile Description</label>
+      <textarea formControlName="profile" id="profile"></textarea>
+      <button type="submit" (click)="saveUser(myForm)">Submit</button>
+    </form>
+	
+	
+  private myForm: FormGroup = new FormGroup({});
+  constructor(private fb: FormBuilder){ }
+
+  ngOnInit() {
+    this.myForm = this.fb.group({
+      'name': ['', Validators.required],
+      'email': ['', [Validators.required, Validators.email]],
+      'profile': ['', [Validators.required, Validators.minLength(10)]]
+    })
+  }
+  saveUser(form){
+    console.log(form)
+  }
+
+-----------------------------------
  
  
  
