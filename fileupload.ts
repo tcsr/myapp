@@ -186,6 +186,27 @@ Usage:
 
 -----------------------------------
  
+  https://stackoverflow.com/questions/14850553/javascript-regex-for-password-containing-at-least-8-characters-1-number-1-uppe/14850765
+  https://stackoverflow.com/questions/2370015/regular-expression-for-password-validation
+
+
+<div class="panel panel-default">
+  <div class="panel-body center-block centerNav col-xs-12 col-sm-12 col-md-12 col-lg-6">
+    Panel Content.
+  </div>
+</div>
+
+.panel.panel-default {
+    border: 0px !important;
+    padding: 0 10px;
+    border-radius: 4px; 
+    -webkit-box-shadow: none;
+    box-shadow: none;
+}
+.panel-body.center-block.centerNav {
+    border:solid 1px #ddd;
+    float:none;
+}
  
  
  
