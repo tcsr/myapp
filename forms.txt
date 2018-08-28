@@ -1,0 +1,2813 @@
+import { Component, Input, OnInit, ViewChild, ElementRef, TemplateRef, OnChanges, OnDestroy } from '@angular/core';
+import { Router, ActivatedRoute } from '@angular/router';
+import { ValidationService } from '../../validation/validation.service';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { FormGroup, FormBuilder, FormControl, Validators, ReactiveFormsModule, FormsModule, FormArray } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
+import { WebService } from '../../Service/webservice';
+import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
+import { BsModalService, ModalDirective } from 'ngx-bootstrap/modal';
+import { MyDatePicker, IMyDpOptions, IMyDateModel } from 'mydatepicker';
+import { DateService } from '../../Service/date.service';
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/observable/of';
+import { Constants } from '../constants/constants';
+import * as CryptoJS from 'crypto-js';
+
+declare var $: any;
+
+@Component({
+    selector: 'app-medical',
+    templateUrl: './medical.component.html',
+    styleUrls: ['./medical.component.css']
+})
+
+export class MedicalComponent implements OnInit, OnChanges, OnDestroy {
+    public medicalForm: FormGroup;
+    public counter: number;
+    public exclude: any;
+    section: string[];
+    sections: string[];
+    section1 = false;
+    section2 = false;
+    section3 = false;
+    public isActive: string;
+    public assessmentsId: any;
+    private sub: any;
+    public spinnerFlag = false;
+    datePlaceholder: string;
+    checked = false;
+    public roleCD;
+    characterleft: any;
+    private maxlength: any;
+    public emptyForm: boolean;
+    public checkClinicalSymtoms: boolean;
+    public checkMedication: boolean;
+    public checkClinicalSymtomsrowvalue: boolean;
+    public checkMedicationrowvalue: boolean;
+    public myDatePickerOptions: IMyDpOptions = {
+        dateFormat: this.dateService.dateFormate(),
+        editableDateField: true,
+        openSelectorOnInputClick: true,
+        firstDayOfWeek: 'su',
+        disableSince: this.dateService.disableDate()
+    };
+    submitFromTab: boolean;
+    public routeparams = {};
+    public uploadDocumentForm: any;
+    public fileFormData: FormData = new FormData();
+    public UploadFileData: FormData = new FormData();
+    public UploadfileList: any;
+    public UploadDocType: any;
+    public dataUrl: string;
+    public configUrl: string;
+    public myData: any;
+    public nextSection: any;
+    errorPopup: any;
+    showError: boolean;
+    errorFlag: boolean;
+    searchInput: Object = {};
+    public modalRef: BsModalRef;
+    public jsonData: any = {};
+    public deleteFileData: FormData = new FormData();
+    public dateOfBirth;
+    public tardiveDyskenesiaDate;
+    public transfusionsDate;
+    // public examinationDate;
+    public dialysisDate;
+    public physicalTherapyDate;
+    public occupationalTherapyDate;
+    public speechTherapyDate;
+    public respiratoryTherapyDate;
+    public firstName: string;
+    public lastName: string;
+    public suffixName: string;
+    public clinicalValidation;
+    public medicalInfo: any;
+    private autoSuggListAvail: boolean;
+    sectionFromErrorFlag: boolean;
+    digitallySignedBy: string;
+    digitallySignedDate: string;
+    digitallyCounterSignedBy: string;
+    digitallyCounterSignedDate: string;
+    showhiderejcom = false;
+    incompletedCurrentMedicalAxis: boolean;
+    incompletedCurrentMedications: boolean;
+    section1Invalid: boolean;
+    sectionFlag: boolean;
+    public evaluationId: any;
+    pend = false;
+    formdata: any;
+    public config2: any;
+    public selectedItem: any;
+    public inputChanged: any;
+    public items1: any;
+    public items2: any;
+    public rejecttextbox = false;
+    public checkDateDisabled: boolean;
+    pending = false;
+    countersigneeExists;
+    formSectionErrorData: any;
+    counterSigneeId;
+    public showPrintBtn: boolean;
+    denySave = false;
+    dublicateFormPopup;
+    newAssessmentId;
+    submitChecked = true;
+    icdlookup: any = {};
+    pendError;
+    JSONStartdate: any = {};
+    private booleanFlags = ['catheterCare', 'intakeOutput', 'ostomyCare', 'radiation',
+        'transfusions', 'dialysis', 'suctioning', 'ivMedications',
+        'physicalTherapy', 'occupationalTherapy', 'oxygenTherapy', 'speechTherapy', 'decubitusCare', 'respiratoryTherapy',
+        'dressings', 'accuchecks', 'other', 'cardiovascular', 'respiratory', 'gastrointenstinal',
+        'genitourinary', 'musculoskeletal', 'neurological', 'endocrine', 'dietaryDentition', 'speech',
+        'skin', 'hearing', 'vision', 'allergies', 'physicalAssessmentOther', 'equipmentOther'
+        , 'tracheotomy', 'tracheotomy', 'suctioningOral', 'suctioningDeep', 'chemotherapy', 'wheelchair',
+        'customWheelChair', 'personalWheelchair', 'nfWheelchair', 'handSplints', 'hearingAid', 'cane', 'walker',
+        'braces', 'hospitalBed', 'sidelyer', 'amplificationDevices', 'glasses', 'mechanicalLift', 'siderails',
+        'dentures', 'commode'];
+    cmhView = false;
+    showArrowBtn = true;
+    showButtons = true;
+    status;
+    finalSection;
+    finalSectionLength;
+    noItems;
+    touchForm = true;
+    @ViewChild('loadLocal') private localData;
+    @ViewChild('loadCancel') private loadCancel;
+    @ViewChild('resetData') private resetData;
+    @ViewChild('section1') section1Link;
+    @ViewChild('uploadModal') public uploadModal: ModalDirective;
+    uploadFileChange: Object = {};
+    fromErrorFlag: boolean;
+    dublicateAlert: boolean;
+    edited: boolean;
+    assessIdCurrentUserID;
+    formErrorData: any;
+    userName;
+    time;
+    format = 'mm/dd/yyyy';
+    customError;
+
+    public heightDropDown =
+        [
+            // 4
+            { 'id': 48, 'name': "4'" }, { 'id': 49, 'name': "4'1" }, { 'id': 50, 'name': "4'2" }, { 'id': 51, 'name': "4'3" },
+            { 'id': 52, 'name': "4'4" }, { 'id': 53, 'name': "4'5" }, { 'id': 54, 'name': "4'6" }, { 'id': 55, 'name': "4'7" },
+            { 'id': 56, 'name': "4'8" }, { 'id': 57, 'name': "4'9" }, { 'id': 58, 'name': "4'10" }, { 'id': 59, 'name': "4'11" },
+            //5
+            { 'id': 60, 'name': "5'" }, { 'id': 61, 'name': "5'1" }, { 'id': 62, 'name': "5'2" }, { 'id': 63, 'name': "5'3" },
+            { 'id': 64, 'name': "5'4" }, { 'id': 65, 'name': "5'5" }, { 'id': 66, 'name': "5'6" }, { 'id': 67, 'name': "5'7" },
+            { 'id': 68, 'name': "5'8" }, { 'id': 69, 'name': "5'9" }, { 'id': 70, 'name': "5'10" }, { 'id': 71, 'name': "5'11" },
+            //6
+            { 'id': 72, 'name': "6'" }, { 'id': 73, 'name': "6'1" }, { 'id': 74, 'name': "6'2" }, { 'id': 75, 'name': "6'3" },
+            { 'id': 76, 'name': "6'4" }, { 'id': 77, 'name': "6'5" }, { 'id': 78, 'name': "6'6" }, { 'id': 79, 'name': "6'7" },
+            { 'id': 80, 'name': "6'8" }, { 'id': 81, 'name': "6'9" }, { 'id': 82, 'name': "6'10" }, { 'id': 83, 'name': "6'11" },
+            //7
+            { 'id': 84, 'name': "7'" }, { 'id': 85, 'name': "7'1" }, { 'id': 86, 'name': "7'2" }, { 'id': 87, 'name': "7'3" },
+            { 'id': 88, 'name': "7'4" }, { 'id': 89, 'name': "7'5" }, { 'id': 90, 'name': "7'6" }, { 'id': 91, 'name': "7'7" },
+            { 'id': 92, 'name': "7'8" }, { 'id': 93, 'name': "7'9" }, { 'id': 94, 'name': "7'10" }, { 'id': 95, 'name': "7'11" },
+            //8
+            { 'id': 96, 'name': "8'" }, { 'id': 97, 'name': "8'1" }, { 'id': 98, 'name': "8'2" }, { 'id': 99, 'name': "8'3" },
+            { 'id': 100, 'name': "8'4" }, { 'id': 101, 'name': "8'5" }, { 'id': 102, 'name': "8'6" }, { 'id': 103, 'name': "8'7" },
+            { 'id': 104, 'name': "8'8" }, { 'id': 105, 'name': "8'9" }, { 'id': 106, 'name': "8'10" }, { 'id': 107, 'name': "8'11" }
+        ];
+
+    public dialysisType = [
+        { 'id': '1', 'name': 'Hemodialysis', 'value': 'Hemodialysis' },
+        { 'id': '2', 'name': 'Peritoneal Dialysis', 'value': 'Peritonealdialysis' },
+    ];
+
+
+    public medicalPend = {
+        pending: [
+            {
+                'assessmentFormType': 'medical', 'assessmentFormId': '', 'assessmentFieldId': 'evaluationType',
+                'assessmentFieldComment': '', 'pendingsId': null
+            },
+            {
+                'assessmentFormType': 'medical', 'assessmentFormId': '', 'assessmentFieldId': 'physician',
+                'assessmentFieldComment': '', 'pendingsId': null
+            },
+            {
+                'assessmentFormType': 'medical', 'assessmentFormId': '', 'assessmentFieldId': 'currentHeight',
+                'assessmentFieldComment': '', 'pendingsId': null
+            },
+            {
+                'assessmentFormType': 'medical', 'assessmentFormId': '', 'assessmentFieldId': 'currentWeight',
+                'assessmentFieldComment': '', 'pendingsId': null
+            },
+            {
+                'assessmentFormType': 'medical', 'assessmentFormId': '', 'assessmentFieldId': 'bloodPressure',
+                'assessmentFieldComment': '', 'pendingsId': null
+            },
+            {
+                'assessmentFormType': 'medical', 'assessmentFormId': '', 'assessmentFieldId': 'pulseRate',
+                'assessmentFieldComment': '', 'pendingsId': null
+            },
+            {
+                'assessmentFormType': 'medical', 'assessmentFormId': '', 'assessmentFieldId': 'respirations',
+                'assessmentFieldComment': '', 'pendingsId': null
+            },
+            {
+                'assessmentFormType': 'medical', 'assessmentFormId': '', 'assessmentFieldId': 'ibwr',
+                'assessmentFieldComment': '', 'pendingsId': null
+            },
+            {
+                'assessmentFormType': 'medical', 'assessmentFormId': '', 'assessmentFieldId': 'currentMedical',
+                'assessmentFieldComment': '', 'pendingsId': null
+            },
+            {
+                'assessmentFormType': 'medical', 'assessmentFormId': '', 'assessmentFieldId': 'currentMedications',
+                'assessmentFieldComment': '', 'pendingsId': null
+            },
+            {
+                'assessmentFormType': 'medical', 'assessmentFormId': '', 'assessmentFieldId': 'psychotropicMedication',
+                'assessmentFieldComment': '', 'pendingsId': null
+            },
+            {
+                'assessmentFormType': 'medical', 'assessmentFormId': '', 'assessmentFieldId': 'medicationHistory',
+                'assessmentFieldComment': '', 'pendingsId': null
+            },
+            {
+                'assessmentFormType': 'medical', 'assessmentFormId': '', 'assessmentFieldId': 'clinicalSymptoms',
+                'assessmentFieldComment': '', 'pendingsId': null
+            },
+            {
+                'assessmentFormType': 'medical', 'assessmentFormId': '', 'assessmentFieldId': 'notes',
+                'assessmentFieldComment': '', 'pendingsId': null
+            },
+            {
+                'assessmentFormType': 'medical', 'assessmentFormId': '', 'assessmentFieldId': 'cardiovascular',
+                'assessmentFieldComment': '', 'pendingsId': null
+            },
+            {
+                'assessmentFormType': 'medical', 'assessmentFormId': '', 'assessmentFieldId': 'gastrointenstinal',
+                'assessmentFieldComment': '', 'pendingsId': null
+            },
+            {
+                'assessmentFormType': 'medical', 'assessmentFormId': '', 'assessmentFieldId': 'musculoskeletal',
+                'assessmentFieldComment': '', 'pendingsId': null
+            },
+            {
+                'assessmentFormType': 'medical', 'assessmentFormId': '', 'assessmentFieldId': 'endocrine',
+                'assessmentFieldComment': '', 'pendingsId': null
+            },
+            {
+                'assessmentFormType': 'medical', 'assessmentFormId': '', 'assessmentFieldId': 'skin',
+                'assessmentFieldComment': '', 'pendingsId': null
+            },
+            {
+                'assessmentFormType': 'medical', 'assessmentFormId': '', 'assessmentFieldId': 'hearing',
+                'assessmentFieldComment': '', 'pendingsId': null
+            },
+            {
+                'assessmentFormType': 'medical', 'assessmentFormId': '', 'assessmentFieldId': 'allergies',
+                'assessmentFieldComment': '', 'pendingsId': null
+            },
+            {
+                'assessmentFormType': 'medical', 'assessmentFormId': '', 'assessmentFieldId': 'abnormalLabValues',
+                'assessmentFieldComment': '', 'pendingsId': null
+            },
+            {
+                'assessmentFormType': 'medical', 'assessmentFormId': '', 'assessmentFieldId': 'respiratory',
+                'assessmentFieldComment': '', 'pendingsId': null
+            },
+            {
+                'assessmentFormType': 'medical', 'assessmentFormId': '', 'assessmentFieldId': 'genitourinary',
+                'assessmentFieldComment': '', 'pendingsId': null
+            },
+            {
+                'assessmentFormType': 'medical', 'assessmentFormId': '', 'assessmentFieldId': 'neurological',
+                'assessmentFieldComment': '', 'pendingsId': null
+            },
+            {
+                'assessmentFormType': 'medical', 'assessmentFormId': '', 'assessmentFieldId': 'dietaryDentition',
+                'assessmentFieldComment': '', 'pendingsId': null
+            },
+            {
+                'assessmentFormType': 'medical', 'assessmentFormId': '', 'assessmentFieldId': 'speech',
+                'assessmentFieldComment': '', 'pendingsId': null
+            },
+            {
+                'assessmentFormType': 'medical', 'assessmentFormId': '', 'assessmentFieldId': 'vision',
+                'assessmentFieldComment': '', 'pendingsId': null
+            },
+            {
+                'assessmentFormType': 'medical', 'assessmentFormId': '', 'assessmentFieldId': 'physicalAssessmentOther',
+                'assessmentFieldComment': '', 'pendingsId': null
+            },
+            {
+                'assessmentFormType': 'medical', 'assessmentFormId': '', 'assessmentFieldId': 'surgeriesDiagnosticProc',
+                'assessmentFieldComment': '', 'pendingsId': null
+            },
+            {
+                'assessmentFormType': 'medical', 'assessmentFormId': '', 'assessmentFieldId': 'prosthesis',
+                'assessmentFieldComment': '', 'pendingsId': null
+            },
+            {
+                'assessmentFormType': 'medical', 'assessmentFormId': '', 'assessmentFieldId': 'equipmentNotes',
+                'assessmentFieldComment': '', 'pendingsId': null
+            },
+            {
+                'assessmentFormType': 'medical', 'assessmentFormId': '', 'assessmentFieldId': 'bedMobility',
+                'assessmentFieldComment': '', 'pendingsId': null
+            },
+            {
+                'assessmentFormType': 'medical', 'assessmentFormId': '', 'assessmentFieldId': 'transfer',
+                'assessmentFieldComment': '', 'pendingsId': null
+            },
+            {
+                'assessmentFormType': 'medical', 'assessmentFormId': '', 'assessmentFieldId': 'locomotion',
+                'assessmentFieldComment': '', 'pendingsId': null
+            },
+            {
+                'assessmentFormType': 'medical', 'assessmentFormId': '', 'assessmentFieldId': 'dressing',
+                'assessmentFieldComment': '', 'pendingsId': null
+            },
+            {
+                'assessmentFormType': 'medical', 'assessmentFormId': '', 'assessmentFieldId': 'eating',
+                'assessmentFieldComment': '', 'pendingsId': null
+            },
+            {
+                'assessmentFormType': 'medical', 'assessmentFormId': '', 'assessmentFieldId': 'toiletUse',
+                'assessmentFieldComment': '', 'pendingsId': null
+            },
+            {
+                'assessmentFormType': 'medical', 'assessmentFormId': '', 'assessmentFieldId': 'personalHygiene',
+                'assessmentFieldComment': '', 'pendingsId': null
+            },
+            {
+                'assessmentFormType': 'medical', 'assessmentFormId': '', 'assessmentFieldId': 'bathing',
+                'assessmentFieldComment': '', 'pendingsId': null
+            },
+            {
+                'assessmentFormType': 'medical', 'assessmentFormId': '', 'assessmentFieldId': 'administerOwnMeds',
+                'assessmentFieldComment': '', 'pendingsId': null
+            },
+            {
+                'assessmentFormType': 'medical', 'assessmentFormId': '', 'assessmentFieldId': 'manageFinAffairs',
+                'assessmentFieldComment': '', 'pendingsId': null
+            },
+            {
+                'assessmentFormType': 'medical', 'assessmentFormId': '', 'assessmentFieldId': 'manageDomesticResp',
+                'assessmentFieldComment': '', 'pendingsId': null
+            },
+            {
+                'assessmentFormType': 'medical', 'assessmentFormId': '', 'assessmentFieldId': 'monitorNutrStatus',
+                'assessmentFieldComment': '', 'pendingsId': null
+            },
+            {
+                'assessmentFormType': 'medical', 'assessmentFormId': '', 'assessmentFieldId': 'monitorHealthStatus',
+                'assessmentFieldComment': '', 'pendingsId': null
+            },
+            {
+                'assessmentFormType': 'medical', 'assessmentFormId': '', 'assessmentFieldId': 'restrictivesetting',
+                'assessmentFieldComment': '', 'pendingsId': null
+            },
+            {
+                'assessmentFormType': 'medical', 'assessmentFormId': '', 'assessmentFieldId': 'recommendations',
+                'assessmentFieldComment': '', 'pendingsId': null
+            },
+        ]
+    };
+    rejectValue: any;
+    invalidDate: boolean;
+    futureDateFlag: boolean;
+    startDateFutureDateFlag: boolean;
+    startDateInvalidDate: boolean;
+    tardiveDyskenesiaInvalidDate: boolean;
+    tardiveDyskenesiaDateFutureFlag: boolean;
+    TransfusionsInvalidDate: boolean;
+    TransfusionsFutureDateFlag: boolean;
+    DialysisInvalidDate: boolean;
+    DialysisFutureDateFlag: boolean;
+    PhysicalInvalidDate: boolean;
+    PhysicalFutureDateFlag: boolean;
+    occupationalInvalidDate: boolean;
+    occupationalFutureDateFlag: boolean;
+    TherapyDurationInvalidDate: boolean;
+    TherapyDurationFutureDateFlag: boolean;
+    RespiratoryInvalidDate: boolean;
+    RespiratoryFutureDateFlag: boolean;
+    StartInvalidDate: boolean;
+    StartFutureDateFlag: boolean;
+    startDate: any;
+    public errorMgsKeys = this.constants.errorMgsKeysForm(this.constants.MEDICAL_FORM);
+    match = new RegExp(this.format
+        .replace(/(\w+)\W(\w+)\W(\w+)/, '^\\s*($1)\\W*($2)?\\W*($3)?([0-9]*).*')
+        .replace(/m|d|y/g, '\\d'));
+    doFormat(target) {
+        target.value = target.value
+            .replace(/(^|\W)(?=\d\W)/g, '$10')   // padding
+            .replace(this.match, '$1/$2/$3$4')   // fields
+            .replace(/(\W)+/g, '$1');            // remove repeats
+        return target.value;
+    }
+    formModified;
+    constructor(private formBuilder: FormBuilder, private router: Router,
+        private activeRoute: ActivatedRoute, private dateService: DateService, private httpService: WebService,
+        private modalService: BsModalService, private _sanitizer: DomSanitizer,
+        private constants: Constants, private elem: ElementRef) {
+        this.submitFromTab = false;
+        this.checkClinicalSymtomsrowvalue = false;
+        this.checkMedicationrowvalue = false;
+        this.section = ['section1', 'section2', 'section3', 'section4', 'section5', 'section6'];
+        this.isActive = '';
+        this.checkClinicalSymtoms = false;
+        this.checkMedication = false;
+        this.clinicalValidation = false;
+        this.medicalInfo = [];
+        this.items2 = [''];
+        this.config2 = { 'placeholder': 'test', 'sourceField': ['payload', 'label'] };
+        this.autoSuggListAvail = false;
+        this.maxlength = 4000;
+        this.section1Invalid = false;
+        // this.loadicdLookup();
+        this.errorPopup = 0;
+        this.exclude = '';
+        this.formErrorData = [];
+        this.invalidDate = false;
+        this.futureDateFlag = false;
+        this.tardiveDyskenesiaInvalidDate = false;
+        this.tardiveDyskenesiaDateFutureFlag = false;
+        this.TransfusionsInvalidDate = false;
+        this.TransfusionsFutureDateFlag = false;
+        this.DialysisInvalidDate = false;
+        this.DialysisFutureDateFlag = false;
+        this.PhysicalInvalidDate = false;
+        this.PhysicalFutureDateFlag = false;
+        this.occupationalInvalidDate = false;
+        this.occupationalFutureDateFlag = false;
+        this.TherapyDurationInvalidDate = false;
+        this.TherapyDurationFutureDateFlag = false;
+        this.RespiratoryInvalidDate = false;
+        this.RespiratoryFutureDateFlag = false;
+        this.StartInvalidDate = false;
+        this.StartFutureDateFlag = false;
+    }
+    observableSource(keyword: any) {
+        this.loadicdLookup(keyword);
+        setTimeout(function () {
+            document.querySelector('.no-match-found').setAttribute('style', 'display: none !important;');
+        }, 0);
+        return Observable.of(this.items2);
+    }
+    loadicdLookup(val: any) {
+        this.items2 = [];
+        this.items1 = [];
+        //this.spinnerFlag = true;
+        this.autoSuggListAvail = false;
+        if (this.elem.nativeElement.getElementsByTagName('ng2-auto-complete')[0]) {
+            // this.elem.nativeElement.getElementsByTagName('ng2-auto-complete')[0].setAttribute('style', 'display: none !important;');
+            let divClass = document.querySelector(".ng2-auto-complete");
+            if (document.querySelectorAll(".loadingMedical").length === 0) {
+                let ul = document.createElement("ul");
+                ul.setAttribute('class', 'loadingMedical');
+                let li = document.createElement("li");
+                li.appendChild(document.createTextNode("Loading..."));
+                ul.appendChild(li);
+                divClass.appendChild(ul);
+            } else {
+                $('.loadingMedical').show();
+            }
+        }
+        const control = <FormArray>this.medicalForm.controls['diagnosesEntities'];
+        // control.controls[loc].get('icdDiagnosesId').setValue('');
+        this.exclude = '';
+        if (control.length > 0) {
+            for (let i = 0; i < control.length; i++) {
+                if (control.value[i].description !== '' && control.value[i].onset !== '' &&
+                    control.value[i].history !== '' && control.value[i].prognosis !== '' &&
+                    control.value[i].icdDiagnosesId !== null && control.value[i].icdDiagnosesId !== '') {
+                    // this.items1[i] = control.value[i].icdDiagnosesId;
+                    this.exclude += '&exclude=' + control.value[i].icdDiagnosesId;
+                } else {
+                    this.exclude += '&exclude=-1';
+                }
+            }
+        } else {
+            this.exclude = '&exclude=-1';
+        }
+
+        this.httpService.getRecord('icdLookup?searchStr=' + val + this.exclude).subscribe(res => {
+            if (res.global === 'successMsg@') {
+                if (res.data.length > 0) {
+                    for (let i = 0; i < res.data.length; i++) {
+                        if (res.data[i].icdDiagnosesId !== null && res.data[i].code !== null) {
+                            // if (this.items1.indexOf(res.data[i].icdDiagnosesId) < 0) {
+                            this.items2.push({
+                                'id': res.data[i].icdDiagnosesId, 'name': res.data[i].code
+                                , 'desc': res.data[i].description
+                            });
+                            this.items1.push(res.data[i].code);
+                            // }
+                        }
+                    }
+                    this.autoSuggListAvail = true;
+                } else {
+                    this.items2 = [];
+                }
+
+                this.spinnerFlag = false;
+            } else {
+                this.router.navigate(['/internalserver']);
+            }
+            this.spinnerFlag = false;
+            let child = document.querySelector(".loadingMedical");
+            $(".loadingMedical").remove();
+            $('.no-match-found').show();
+            if (this.elem.nativeElement.getElementsByTagName('ng2-auto-complete')[0]) {
+                this.elem.nativeElement.getElementsByTagName('ng2-auto-complete')
+                [0].setAttribute('style', 'display: inline-block !important;position: absolute !important;z-index: 9999');
+            }
+        }, error => {
+            this.spinnerFlag = false;
+        });
+    }
+
+    autocompleListFormatter = (data: any) => {
+        const html = `<span>${data.name} - ${data.desc} </span>`;
+        return this._sanitizer.bypassSecurityTrustHtml(html);
+    }
+
+    onChangeIcd(event: any, i: any) {
+        const control = <FormArray>this.medicalForm.controls['diagnosesEntities'];
+        if (typeof event === 'object') {
+            control.controls[i].get('description').setValue(event.name);
+            control.controls[i].get('icdDiagnosesId').setValue(event.id);
+        }
+    }
+
+    ngOnInit() {
+
+        this.sub = this.activeRoute.params.subscribe(params => {
+            this.assessmentsId = Number(params['assessmentsId']);
+            if (params['cmhView'] && params['showButtons']) {
+                this.cmhView = params['cmhView'];
+                this.showButtons = params['showButtons'];
+            }
+        });
+
+        this.assessIdCurrentUserID = this.constants.MEDICAL_FORM + this.constants.getCurrent();
+
+        this.medicalForm = this.formBuilder.group({
+            'medicalFormId': [''],
+            'evaluationId': [''],
+            'assessmentsId': [this.assessmentsId],
+            'signeeId': [''],
+            'counterSigneeId': [''],
+            'section': [''],
+            // section 1
+            'isFirstScreenDone': [''],
+            'isSecondScreenDone': [''],
+            'isThirdScreenDone': [''],
+            'isFourthScreenDone': [''],
+            'isFifthScreenDone': [''],
+            'isSixthScreenDone': [''],
+            'examinationDate': this.sectionFormControl(Constant.SECTION1, true),
+            'physician': this.sectionFormControl(Constant.SECTION1, true),
+            'currentHeight': this.sectionFormControl(Constant.SECTION1, true),
+            'currentWeight': this.sectionFormControl(Constant.SECTION1, true),
+            'bloodPressure': this.sectionFormControl(Constant.SECTION1, true),
+            'pulseRate': this.sectionFormControl(Constant.SECTION1, true),
+            'respirations': this.sectionFormControl(Constant.SECTION1, true),
+            'ibwr': this.sectionFormControl(Constant.SECTION1, true),
+            'tardiveDyskenesia': this.sectionFormControl(Constant.SECTION1, true),
+            'tardiveDyskenesiaDate': this.sectionFormControl(Constant.SECTION1, false),
+            'medicationHistory': this.sectionFormControl(Constant.SECTION1, true),
+            'diagnosesEntities': this.formBuilder.array([
+                this.initdiagnosesEntities(),
+            ]),
+            'currentMedEntities': this.formBuilder.array([
+                this.initcurrentMedEntities(),
+            ]),
+
+            // section 2
+
+            'chemotherapy': this.sectionFormControl(Constant.SECTION2, false),
+            'radiation': this.sectionFormControl(Constant.SECTION2, false),
+            'tracheotomy': this.sectionFormControl(Constant.SECTION2, false),
+            'transfusions': this.sectionFormControl(Constant.SECTION2, false),
+            'transfusionsDate': this.sectionFormControl(Constant.SECTION2, false),
+            'dialysis': this.sectionFormControl(Constant.SECTION2, false),
+            'dialysisStartDate': this.sectionFormControl(Constant.SECTION2, false),
+            'dialysisType': this.sectionFormControl(Constant.SECTION2, false),
+            'dialysisFrequency': this.sectionFormControl(Constant.SECTION2, false),
+            'suctioning': this.sectionFormControl(Constant.SECTION2, false),
+            'suctioningOral': this.sectionFormControl(Constant.SECTION2, false),
+            'suctioningDeep': this.sectionFormControl(Constant.SECTION2, false),
+            'suctioningFrequency': this.sectionFormControl(Constant.SECTION2, false),
+            'ivMedications': this.sectionFormControl(Constant.SECTION2, false),
+            'ivMedicationsType': this.sectionFormControl(Constant.SECTION2, false),
+            'ivMedicationsDuration': this.sectionFormControl(Constant.SECTION2, false),
+            'physicalTherapyDate': this.sectionFormControl(Constant.SECTION2, false),
+            'physicalTherapy': this.sectionFormControl(Constant.SECTION2, false),
+            'physicalTherapyDuration': this.sectionFormControl(Constant.SECTION2, false),
+            'occupationalTherapy': this.sectionFormControl(Constant.SECTION2, false),
+            'occupationalTherapyDate': this.sectionFormControl(Constant.SECTION2, false),
+            'occupationalTherapyDuration': this.sectionFormControl(Constant.SECTION2, false),
+            'oxygenTherapy': this.sectionFormControl(Constant.SECTION2, false),
+            'litersPerMinute': this.sectionFormControl(Constant.SECTION2, false),
+            'oxygenTherapyFrequency': this.sectionFormControl(Constant.SECTION2, false),
+            'speechTherapy': this.sectionFormControl(Constant.SECTION2, false),
+            'speechTherapyDate': this.sectionFormControl(Constant.SECTION2, false),
+            'speechTherapyDuration': this.sectionFormControl(Constant.SECTION2, false),
+            'decubitusCare': this.sectionFormControl(Constant.SECTION2, false),
+            'stage': this.sectionFormControl(Constant.SECTION2, false),
+            'location': this.sectionFormControl(Constant.SECTION2, false),
+            'respiratoryTherapy': this.sectionFormControl(Constant.SECTION2, false),
+            'respiratoryTherapyDate': this.sectionFormControl(Constant.SECTION2, false),
+            'respiratoryTherapyDuration': this.sectionFormControl(Constant.SECTION2, false),
+            'dressings': this.sectionFormControl(Constant.SECTION2, false),
+            'site': this.sectionFormControl(Constant.SECTION2, false),
+            'type': this.sectionFormControl(Constant.SECTION2, false),
+            'dressingsFrequency': this.sectionFormControl(Constant.SECTION2, false),
+            'catheterCare': this.sectionFormControl(Constant.SECTION2, false),
+            'intakeOutput': this.sectionFormControl(Constant.SECTION2, false),
+            'ostomyCare': this.sectionFormControl(Constant.SECTION2, false),
+            'accuchecks': this.sectionFormControl(Constant.SECTION2, false),
+            'accuchecksFrequency': this.sectionFormControl(Constant.SECTION2, false),
+            'other': this.sectionFormControl(Constant.SECTION2, false),
+            'otherText': this.sectionFormControl(Constant.SECTION2, false),
+            'notes': this.sectionFormControl(Constant.SECTION2, true),
+            // section 3
+            'cardiovascular': this.sectionFormControl(Constant.SECTION3, false),
+            'cardiovascularDescription': this.sectionFormControl(Constant.SECTION3, false),
+            'respiratory': this.sectionFormControl(Constant.SECTION3, false),
+            'respiratoryDescription': this.sectionFormControl(Constant.SECTION3, false),
+            'gastrointenstinal': this.sectionFormControl(Constant.SECTION3, false),
+            'gastrointenstinalDescription': this.sectionFormControl(Constant.SECTION3, false),
+            'genitourinary': this.sectionFormControl(Constant.SECTION3, false),
+            'genitourinaryDescription': this.sectionFormControl(Constant.SECTION3, false),
+            'musculoskeletal': this.sectionFormControl(Constant.SECTION3, false),
+            'musculoskeletalDescription': this.sectionFormControl(Constant.SECTION3, false),
+            'neurological': this.sectionFormControl(Constant.SECTION3, false),
+            'neurologicalDescription': this.sectionFormControl(Constant.SECTION3, false),
+            'endocrine': this.sectionFormControl(Constant.SECTION3, false),
+            'endocrineDescription': this.sectionFormControl(Constant.SECTION3, false),
+            'dietaryDentition': this.sectionFormControl(Constant.SECTION3, false),
+            'dietaryDentitionDescription': this.sectionFormControl(Constant.SECTION3, false),
+            'skin': this.sectionFormControl(Constant.SECTION3, false),
+            'skinDescription': this.sectionFormControl(Constant.SECTION3, false),
+            'speech': this.sectionFormControl(Constant.SECTION3, false),
+            'speechDescription': this.sectionFormControl(Constant.SECTION3, false),
+            'hearing': this.sectionFormControl(Constant.SECTION3, false),
+            'hearingDescription': this.sectionFormControl(Constant.SECTION3, false),
+            'vision': this.sectionFormControl(Constant.SECTION3, false),
+            'visionDescription': this.sectionFormControl(Constant.SECTION3, false),
+            'allergies': this.sectionFormControl(Constant.SECTION3, false),
+            'allergiesDescription': this.sectionFormControl(Constant.SECTION3, false),
+            'physicalAssessmentOther': this.sectionFormControl(Constant.SECTION3, false),
+            'physicalAssessmentOtherDescription': this.sectionFormControl(Constant.SECTION3, false),
+            'abnormalLabValues': this.sectionFormControl(Constant.SECTION3, true),
+            // section 3
+            'surgeriesDiagnosticProc': this.sectionFormControl(Constant.SECTION4, true),
+            'wheelchair': this.sectionFormControl(Constant.SECTION4, false),
+            'customWheelChair': this.sectionFormControl(Constant.SECTION4, false),
+            'personalWheelchair': this.sectionFormControl(Constant.SECTION4, false),
+            'nfWheelchair': this.sectionFormControl(Constant.SECTION4, false),
+            'handSplints': this.sectionFormControl(Constant.SECTION4, false),
+            'hearingAid': this.sectionFormControl(Constant.SECTION4, false),
+            'cane': this.sectionFormControl(Constant.SECTION4, false),
+            'walker': this.sectionFormControl(Constant.SECTION4, false),
+            'braces': this.sectionFormControl(Constant.SECTION4, false),
+            'hospitalBed': this.sectionFormControl(Constant.SECTION4, false),
+            'sidelyer': this.sectionFormControl(Constant.SECTION4, false),
+            'amplificationDevices': this.sectionFormControl(Constant.SECTION4, false),
+            'glasses': this.sectionFormControl(Constant.SECTION4, false),
+            'mechanicalLift': this.sectionFormControl(Constant.SECTION4, false),
+            'siderails': this.sectionFormControl(Constant.SECTION4, false),
+            'dentures': this.sectionFormControl(Constant.SECTION4, false),
+            'commode': this.sectionFormControl(Constant.SECTION4, false),
+            'equipmentOther': this.sectionFormControl(Constant.SECTION4, false),
+            'equipmentOtherText': this.sectionFormControl(Constant.SECTION4, false),
+            'equipmentNotes': this.sectionFormControl(Constant.SECTION4, true),
+
+            // section 5
+            'bedMobility': this.sectionFormControl(Constant.SECTION5, true),
+            'transfer': this.sectionFormControl(Constant.SECTION5, true),
+            'locomotion': this.sectionFormControl(Constant.SECTION5, true),
+            'dressing': this.sectionFormControl(Constant.SECTION5, true),
+            'eating': this.sectionFormControl(Constant.SECTION5, true),
+            'toiletUse': this.sectionFormControl(Constant.SECTION5, true),
+            'personalHygiene': this.sectionFormControl(Constant.SECTION5, true),
+            'bathing': this.sectionFormControl(Constant.SECTION5, true),
+            'administerOwnMeds': this.sectionFormControl(Constant.SECTION5, true),
+            'administerOwnMedsDesc': this.sectionFormControl(Constant.SECTION5, false),
+            'manageFinAffairs': this.sectionFormControl(Constant.SECTION5, true),
+            'manageFinAffairsDesc': this.sectionFormControl(Constant.SECTION5, false),
+            'manageDomesticResp': this.sectionFormControl(Constant.SECTION5, true),
+            'manageDomesticRespDesc': this.sectionFormControl(Constant.SECTION5, false),
+            'monitorNutrStatus': this.sectionFormControl(Constant.SECTION5, true),
+            'monitorNutrStatusDesc': this.sectionFormControl(Constant.SECTION5, false),
+            'monitorHealthStatus': this.sectionFormControl(Constant.SECTION5, true),
+            'monitorHealthStatusDesc': this.sectionFormControl(Constant.SECTION5, false),
+            'csNotes': this.sectionFormControl(Constant.SECTION5, false),
+            'rejectionComments': [{ value: '', disabled: true }],
+            'signedDate': this.sectionFormControl(Constant.SECTION5, false),
+            'counterSignedDate': this.sectionFormControl(Constant.SECTION5, false),
+            'isAssessorView': this.sectionFormControl(Constant.SECTION5, false),
+            'currentMedicationsId': this.sectionFormControl(Constant.SECTION5, false),
+            'notSeen': this.sectionFormControl(Constant.SECTION5, false),
+            'diagnosesId': this.sectionFormControl(Constant.SECTION5, false),
+            'currentMedicalDiagnosesId': this.sectionFormControl(Constant.SECTION5, false),
+
+            // section 6
+            'recommendations': this.sectionFormControl(Constant.SECTION6, true),
+            'submit': this.sectionFormControl(Constant.SECTION6, true),
+            'exceedCapacityExplain': this.sectionFormControl(Constant.SECTION6, false),
+            'exceedCapacity': this.sectionFormControl(Constant.SECTION6, true),
+            'status': [],
+            'versionNumber': [],
+            'isOverriding': [],
+            'modifiedOn': [],
+            'createdOn': [],
+            'clientName': [],
+            'physicianExist': []
+        });
+        this.formModified = this.medicalForm;
+        this.uploadDocumentForm = this.formBuilder.group({
+            'Upload': ['']
+        });
+
+        this.dataUrl = '';
+        this.configUrl = 'upload.txt';
+        this.searchInput = {
+            'search': '{\"filters\":[{\"id\":\"\",\"value\":\"\"}]}'
+        };
+
+        this.formservice();
+        this.detectValueChange();
+        // To enable localstorage uncomment below methode
+        // this.ngOnChanges();
+        this.finalSection = this.elem.nativeElement.querySelectorAll('.section');
+        this.finalSectionLength = this.finalSection.length;
+        this.finalSection = this.finalSection[this.finalSection.length - 1].id;
+        this.medicalForm.get('examinationDate').valueChanges.subscribe(
+            (tardiveDyskenesia: string) => {
+                const controls = this.medicalForm.controls;
+                if (controls['examinationDate'].valid) {
+                    this.removeTabindex('btnclear');
+                    this.removeTabindex('btnpicker');
+                }
+            }
+        );
+        this.medicalForm.get('currentMedEntities').valueChanges.subscribe(
+            (tardiveDyskenesia: string) => {
+                const controls = this.medicalForm.controls;
+                // if (controls['startDate'].valid) {
+                this.removeTabindex('btnclear');
+                this.removeTabindex('btnpicker');
+                // }
+            }
+        );
+        this.medicalForm.get('tardiveDyskenesiaDate').valueChanges.subscribe(
+            (tardiveDyskenesia: string) => {
+                const controls = this.medicalForm.controls;
+                if (controls['tardiveDyskenesiaDate'].valid) {
+                    this.removeTabindex('btnclear');
+                    this.removeTabindex('btnpicker');
+                }
+            }
+        );
+        this.medicalForm.get('transfusionsDate').valueChanges.subscribe(
+            (tardiveDyskenesia: string) => {
+                const controls = this.medicalForm.controls;
+                if (controls['transfusionsDate'].valid) {
+                    this.removeTabindex('btnclear');
+                    this.removeTabindex('btnpicker');
+                }
+            }
+        );
+        this.medicalForm.get('dialysisStartDate').valueChanges.subscribe(
+            (tardiveDyskenesia: string) => {
+                const controls = this.medicalForm.controls;
+                if (controls['dialysisStartDate'].valid) {
+                    this.removeTabindex('btnclear');
+                    this.removeTabindex('btnpicker');
+                }
+            }
+        );
+        this.medicalForm.get('physicalTherapyDate').valueChanges.subscribe(
+            (tardiveDyskenesia: string) => {
+                const controls = this.medicalForm.controls;
+                if (controls['physicalTherapyDate'].valid) {
+                    this.removeTabindex('btnclear');
+                    this.removeTabindex('btnpicker');
+                }
+            }
+        );
+        this.medicalForm.get('occupationalTherapyDate').valueChanges.subscribe(
+            (tardiveDyskenesia: string) => {
+                const controls = this.medicalForm.controls;
+                if (controls['occupationalTherapyDate'].valid) {
+                    this.removeTabindex('btnclear');
+                    this.removeTabindex('btnpicker');
+                }
+            }
+        );
+        this.medicalForm.get('speechTherapyDate').valueChanges.subscribe(
+            (tardiveDyskenesia: string) => {
+                const controls = this.medicalForm.controls;
+                if (controls['speechTherapyDate'].valid) {
+                    this.removeTabindex('btnclear');
+                    this.removeTabindex('btnpicker');
+                }
+            }
+        );
+        this.medicalForm.get('respiratoryTherapyDate').valueChanges.subscribe(
+            (tardiveDyskenesia: string) => {
+                const controls = this.medicalForm.controls;
+                if (controls['respiratoryTherapyDate'].valid) {
+                    this.removeTabindex('btnclear');
+                    this.removeTabindex('btnpicker');
+                }
+            }
+        );
+    }
+    initdiagnosesEntities() {
+        return this.formBuilder.group({
+            description: ['', Validators.required],
+            onset: ['', Validators.required],
+            history: ['', Validators.required],
+            prognosis: ['', Validators.required],
+            diagnosesId: [''],
+            icdDiagnosesId: []
+        });
+    }
+
+    initcurrentMedEntities() {
+        return this.formBuilder.group({
+            createdOn: [''],
+            modifiedOn: [''],
+            createdBy: [''],
+            modifiedBy: [''],
+            medication: [''],
+            doseSchedule: [''],
+            reason: [''],
+            startDate: [''],
+            currentMedicationsId: ['']
+        });
+    }
+
+    newRow() {
+        const control = <FormArray>this.medicalForm.controls['diagnosesEntities'];
+        if (control.length > 0) {
+            for (let i = 0; i < control.length; i++) {
+                if (control.value[i].description !== '' && control.value[i].onset !== '' &&
+                    control.value[i].history !== '' && control.value[i].prognosis !== '' &&
+                    control.value[i].icdDiagnosesId) {
+                    this.checkClinicalSymtomsrowvalue = true;
+                } else {
+                    this.checkClinicalSymtomsrowvalue = false;
+                    return false;
+                }
+            }
+        }
+        if (this.checkClinicalSymtomsrowvalue) {
+            control.push(this.initdiagnosesEntities());
+        }
+    }
+
+
+    newMedication() {
+        const control = <FormArray>this.medicalForm.controls['currentMedEntities'];
+        if (control.length > 0) {
+            for (let i = 0; i < control.length; i++) {
+                if (control.value[i].medication !== '' && control.value[i].doseSchedule !== '' &&
+                    control.value[i].reason !== '' && control.value[i].startDate) {
+                    this.checkMedicationrowvalue = true;
+                } else {
+                    this.checkMedicationrowvalue = false;
+                    return false;
+                }
+            }
+        }
+        if (this.checkMedicationrowvalue) {
+            control.push(this.initcurrentMedEntities());
+        }
+    }
+    removediagnosesEntities(i: number) {
+        this.spinnerFlag = true;
+        const control = <FormArray>this.medicalForm.controls['diagnosesEntities'];
+        const diagnosesId = control.value[i]['diagnosesId'];
+        if (control.length > 1) {
+            if (diagnosesId) {
+                this.deleteDiagnosesEntities(diagnosesId, i, control);
+            } else {
+                control.removeAt(i);
+            }
+            this.spinnerFlag = false;
+        } else {
+            if (diagnosesId) {
+                control.reset();
+                this.deleteDiagnosesEntities(diagnosesId, i, control);
+            } else {
+                control.reset();
+            }
+            this.spinnerFlag = false;
+        }
+    }
+
+    deleteDiagnosesEntities(diagnosesId: any, i: number, control: FormArray) {
+        this.httpService.getRecord('deleteDiagnoses' + '?diagnosesId=' +
+            diagnosesId).subscribe(res => {
+                if (res.global === 'successMsg@') {
+                    this.spinnerFlag = false;
+                    if (control.length > 1) {
+                        control.removeAt(i);
+                    }
+                } else {
+                    this.router.navigate(['/internalserver']);
+                }
+                this.spinnerFlag = false;
+            }, error => {
+                this.spinnerFlag = false;
+                // console.log(error);
+            });
+    }
+
+
+    removeMedical(i: number) {
+        this.spinnerFlag = true;
+        const control = <FormArray>this.medicalForm.controls['currentMedEntities'];
+        const currentMedEntitiesId = control.value[i]['currentMedicationsId'];
+        if (control.length > 1) {
+            if (currentMedEntitiesId) {
+                this.deleteCurrentMedicalTests(currentMedEntitiesId, i, control);
+            } else {
+                control.removeAt(i);
+                this.spinnerFlag = false;
+            }
+        } else {
+            if (currentMedEntitiesId) {
+                control.reset();
+                this.deleteCurrentMedicalTests(currentMedEntitiesId, i, control);
+            } else {
+                control.reset();
+                this.spinnerFlag = false;
+            }
+        }
+    }
+    deleteCurrentMedicalTests(currentMedEntitiesId: any, i: number, control: FormArray) {
+        this.httpService.getRecord('deleteCurrentMedications' + '?currentMedicationsId=' +
+            currentMedEntitiesId).subscribe(res => {
+                if (res.global === 'successMsg@') {
+                    if (control.length > 1) {
+                        control.removeAt(i);
+                    }
+                } else {
+                    this.router.navigate(['/internalserver']);
+                }
+                this.spinnerFlag = false;
+            }, error => {
+                console.log(error);
+            });
+    }
+    helptooltip(event) {
+        const element = event.target || event.srcElement;
+        const idAttr = element.attributes.id;
+        const value = idAttr.nodeValue;
+        $('.help-text').hide();
+        $('#' + value + '-div-content').insertAfter('#' + value + '-text');
+        $('#' + value + '-div-content').show();
+    }
+    helpformclose(event) {
+        const element = event.target || event.srcElement;
+        const idAttr = element.attributes.id;
+        const value = idAttr.nodeValue;
+        $('#' + value + '-content').hide();
+    }
+
+
+    mseenter(indexvalue) {
+        const element = document.getElementsByClassName('medicalmodal_input' + indexvalue);
+        for (let i = 0; i < element.length; i++) {
+            element[i].classList.add('error_border');
+        }
+    }
+    mouseenter(indexvalue) {
+        const element = document.getElementsByClassName('medical_input' + indexvalue);
+        for (let i = 0; i < element.length; i++) {
+            element[i].classList.add('error_border');
+        }
+    }
+    mouseleave(indexvalue) {
+        const element = document.getElementsByClassName('medical_input' + indexvalue);
+        for (let i = 0; i < element.length; i++) {
+            element[i].classList.remove('error_border');
+        }
+    }
+    mseleave(indexvalue) {
+        const element = document.getElementsByClassName('medicalmodal_input' + indexvalue);
+        for (let i = 0; i < element.length; i++) {
+            element[i].classList.remove('error_border');
+        }
+    }
+    mouseEnters(event) {
+        event.currentTarget.getElementsByTagName('input')[0].placeholder = 'mm/dd/yyyy';
+    }
+    mouseLeaves(event) {
+        event.currentTarget.getElementsByTagName('input')[0].placeholder = '';
+    }
+
+    counterSubmit(checkValidation: boolean) {
+        this.sectionFlag = false;
+        this.fromErrorFlag = false;
+        this.formErrorData = [];
+        const sectionError = {};
+        this.formSectionErrorData = null;
+        let currentSection;
+        if (!this.medicalForm.get('submit').value) {
+            this.medicalForm.get('submit').markAsTouched({ onlySelf: true });
+            if (!this.medicalForm.valid) {
+                this.fromErrorFlag = true;
+                this.touchForm = true;
+                this.formErrorData.push(this.constants.DIGITAL_SIGNATURE);
+            }
+
+        } else {
+            let invalidSection;
+            let temp = true;
+
+            const diagnosesControl = <FormArray>this.medicalForm.get('diagnosesEntities');
+
+            if (diagnosesControl.length > 0) {
+                for (let i = 0; i < diagnosesControl.length; i++) {
+
+                    if (diagnosesControl.value[i].description !== '' && diagnosesControl.value[i].onset !== '' &&
+                        diagnosesControl.value[i].history !== '' && diagnosesControl.value[i].prognosis !== '') {
+                        this.clinicalValidation = true;
+                    } else {
+                        this.clinicalValidation = false;
+                    }
+                }
+            }
+            if (this.roleCD !== 'countersignee' && this.roleCD !== 'coordinator') {
+                if (invalidSection) {
+                    this.isActive = invalidSection;
+                }
+            }
+
+
+            if (this.medicalForm.valid && this.medicalForm.get('submit').value) {
+                this.errorPopup = 0;
+                this.emptyForm = false;
+                this.medicalForm.patchValue({ 'isSixthScreenDone': 'Y' });
+                this.saveMedical(checkValidation);
+            } else {
+
+                Object.keys(this.medicalForm.controls).forEach(field => {
+                    const control = this.medicalForm.get(field);
+                    control.markAsTouched({ onlySelf: true });
+                    let name = field;
+                    if (control.invalid) {
+                        this.fromErrorFlag = true;
+                        this.sectionFlag = true;
+                        if (currentSection !== control['groupName']) {
+                            if (currentSection !== undefined) {
+                                sectionError[currentSection] = this.formErrorData;
+                                this.formErrorData = [];
+                            }
+                            if (control.invalid && temp) {
+                                invalidSection = control['groupName'];
+                                temp = false;
+                            }
+                            currentSection = control['groupName'];
+                        }
+                        if (currentSection === control['groupName']) {
+                            name = name.split(/(?=[A-Z])/).join(' ');
+                            // this.formErrorData.push(name);
+                            if (field !== 'diagnosesEntities') {
+                                this.formErrorData.push(this.errorMgsKeys[field]);
+                            }
+                        }
+                    }
+                });
+                if (invalidSection) {
+                    if (currentSection === this.finalSection) {
+                        sectionError[currentSection] = this.formErrorData;
+                        this.formErrorData = [];
+                    } else {
+                        if (this.formErrorData.length > 0) {
+                            sectionError[currentSection] = this.formErrorData;
+                        }
+                    }
+                    this.sectionnum(invalidSection, false);
+                    this.formSectionErrorData = sectionError;
+                    this.fromErrorFlag = true;
+                    this.sectionFlag = true;
+                }
+                if (this.medicalForm.get('submit').value) {
+                    this.touchForm = true;
+                    this.medicalForm.patchValue({ 'submit': false });
+                    this.medicalFormSubmitSection(this.finalSection, true);
+                    this.touchForm = false;
+                } else {
+                    this.medicalFormSubmitSection(this.finalSection, false);
+                }
+            }
+        }
+    }
+
+    cancelmedicialForm() {
+        this.router.navigate(['/dashboard/assessmentDashboard']);
+    }
+
+
+    setValidation(param: string) {
+        this.medicalForm.get(param).setValidators([Validators.required]);
+        this.medicalForm.get(param).updateValueAndValidity();
+    }
+    disableValidation(param: string) {
+        this.medicalForm.controls[param].patchValue('');
+        this.medicalForm.get(param).setValidators([]);
+        this.medicalForm.get(param).updateValueAndValidity();
+    }
+    detectValueChange() {
+        // section 1
+        this.medicalForm.get('tardiveDyskenesia').valueChanges.subscribe(
+            (tardiveDyskenesia: string) => {
+                if (tardiveDyskenesia && tardiveDyskenesia === 'Y') {
+                    this.setValidation('tardiveDyskenesiaDate');
+                } else {
+                    this.medicalForm.patchValue({ 'tardiveDyskenesiaDate': null });
+                    this.disableValidation('tardiveDyskenesiaDate');
+                }
+                this.medicalForm.updateValueAndValidity();
+            }
+        );
+        // section 2
+
+
+        this.medicalForm.get('transfusions').valueChanges.subscribe(
+            (transfusions: string) => {
+                if (transfusions && transfusions === 'Y') {
+                    const convertString = transfusions.toString();
+                    this.setValidation('transfusionsDate');
+                } else {
+                    this.disableValidation('transfusionsDate');
+                }
+                this.medicalForm.updateValueAndValidity();
+            }
+        );
+
+        this.medicalForm.get('dialysis').valueChanges.subscribe(
+            (dialysis: string) => {
+                if (dialysis) {
+                    const convertString = dialysis.toString();
+                    this.setValidation('dialysisStartDate');
+                    this.setValidation('dialysisFrequency');
+                    this.setValidation('dialysisType');
+                } else {
+                    this.disableValidation('dialysisStartDate');
+                    this.disableValidation('dialysisFrequency');
+                    this.disableValidation('dialysisType');
+                    // this.medicalForm.get('dialysisType').disable();
+                    // this.medicalForm.controls.dialysisType.disable();
+                }
+
+            }
+        );
+
+        this.medicalForm.get('suctioning').valueChanges.subscribe(
+            (suctioning: string) => {
+                if (suctioning) {
+                    this.setValidation('suctioningFrequency');
+                } else {
+                    this.disableValidation('suctioningFrequency');
+                }
+            }
+        );
+
+        this.medicalForm.get('ivMedications').valueChanges.subscribe(
+            (ivMedications: string) => {
+
+                if (ivMedications) {
+                    this.setValidation('ivMedicationsType');
+                    this.setValidation('ivMedicationsDuration');
+                } else {
+                    this.disableValidation('ivMedicationsType');
+                    this.disableValidation('ivMedicationsDuration');
+                }
+
+            }
+        );
+        this.medicalForm.get('physicalTherapy').valueChanges.subscribe(
+            (physicalTherapy: string) => {
+                if (physicalTherapy) {
+                    this.setValidation('physicalTherapyDate');
+                    this.setValidation('physicalTherapyDuration');
+                } else {
+                    this.disableValidation('physicalTherapyDate');
+                    this.disableValidation('physicalTherapyDuration');
+                }
+            }
+        );
+        this.medicalForm.get('occupationalTherapy').valueChanges.subscribe(
+            (occupationalTherapy: string) => {
+                if (occupationalTherapy) {
+                    this.setValidation('occupationalTherapyDate');
+                    this.setValidation('occupationalTherapyDuration');
+                } else {
+                    this.disableValidation('occupationalTherapyDate');
+                    this.disableValidation('occupationalTherapyDuration');
+                }
+            }
+        );
+        this.medicalForm.get('oxygenTherapy').valueChanges.subscribe(
+            (oxygenTherapy: string) => {
+                if (oxygenTherapy) {
+                    this.setValidation('litersPerMinute');
+                    this.setValidation('oxygenTherapyFrequency');
+                } else {
+                    this.disableValidation('litersPerMinute');
+                    this.disableValidation('oxygenTherapyFrequency');
+                }
+            }
+        );
+
+        this.medicalForm.get('speechTherapy').valueChanges.subscribe(
+            (speechTherapy: string) => {
+                if (speechTherapy) {
+                    this.setValidation('speechTherapyDate');
+                    this.setValidation('speechTherapyDuration');
+                } else {
+                    this.disableValidation('speechTherapyDate');
+                    this.disableValidation('speechTherapyDuration');
+                }
+            }
+        );
+        this.medicalForm.get('decubitusCare').valueChanges.subscribe(
+            (decubitusCare: string) => {
+                if (decubitusCare) {
+                    this.setValidation('stage');
+                    this.setValidation('location');
+                } else {
+                    this.disableValidation('stage');
+                    this.disableValidation('location');
+                }
+            }
+        );
+
+        this.medicalForm.get('respiratoryTherapy').valueChanges.subscribe(
+            (respiratoryTherapy: string) => {
+                if (respiratoryTherapy) {
+                    this.setValidation('respiratoryTherapyDate');
+                    this.setValidation('respiratoryTherapyDuration');
+                } else {
+                    this.disableValidation('respiratoryTherapyDate');
+                    this.disableValidation('respiratoryTherapyDuration');
+                }
+            }
+        );
+        this.medicalForm.get('dressings').valueChanges.subscribe(
+            (dressings: string) => {
+                if (dressings) {
+                    this.setValidation('site');
+                    this.setValidation('type');
+                    this.setValidation('dressingsFrequency');
+                } else {
+                    this.disableValidation('site');
+                    this.disableValidation('type');
+                    this.disableValidation('dressingsFrequency');
+                }
+            }
+        );
+        this.medicalForm.get('accuchecks').valueChanges.subscribe(
+            (accuchecks: string) => {
+                if (accuchecks) {
+                    this.setValidation('accuchecksFrequency');
+                } else {
+                    this.disableValidation('accuchecksFrequency');
+                }
+            }
+        );
+        this.medicalForm.get('other').valueChanges.subscribe(
+            (other: string) => {
+                if (other) {
+                    this.setValidation('otherText');
+                } else {
+                    this.disableValidation('otherText');
+                }
+            }
+        );
+
+        // section 3
+        this.medicalForm.get('cardiovascular').valueChanges.subscribe(
+            (cardiovascular: string) => {
+                if (cardiovascular) {
+                    this.setValidation('cardiovascularDescription');
+                } else {
+                    this.medicalForm.patchValue({ 'cardiovascularDescription': '' });
+                    this.disableValidation('cardiovascularDescription');
+                }
+            }
+        );
+
+        this.medicalForm.get('respiratory').valueChanges.subscribe(
+            (respiratory: string) => {
+                if (respiratory) {
+                    this.setValidation('respiratoryDescription');
+                } else {
+                    this.medicalForm.patchValue({ 'respiratoryDescription': '' });
+                    this.disableValidation('respiratoryDescription');
+                }
+            }
+        );
+
+        this.medicalForm.get('gastrointenstinal').valueChanges.subscribe(
+            (gastrointenstinal: string) => {
+                if (gastrointenstinal) {
+                    this.setValidation('gastrointenstinalDescription');
+                } else {
+                    this.medicalForm.patchValue({ 'gastrointenstinalDescription': '' });
+                    this.disableValidation('gastrointenstinalDescription');
+                }
+            }
+        );
+
+        this.medicalForm.get('genitourinary').valueChanges.subscribe(
+            (genitourinary: string) => {
+                if (genitourinary) {
+                    this.setValidation('genitourinaryDescription');
+                } else {
+                    this.medicalForm.patchValue({ 'genitourinaryDescription': '' });
+                    this.disableValidation('genitourinaryDescription');
+                }
+            }
+        );
+        this.medicalForm.get('musculoskeletal').valueChanges.subscribe(
+            (musculoskeletal: string) => {
+                if (musculoskeletal) {
+                    this.setValidation('musculoskeletalDescription');
+                } else {
+                    this.medicalForm.patchValue({ 'musculoskeletalDescription': '' });
+                    this.disableValidation('musculoskeletalDescription');
+                }
+            }
+        );
+        this.medicalForm.get('neurological').valueChanges.subscribe(
+            (neurological: string) => {
+                if (neurological) {
+                    this.setValidation('neurologicalDescription');
+                } else {
+                    this.medicalForm.patchValue({ 'neurologicalDescription': '' });
+                    this.disableValidation('neurologicalDescription');
+                }
+            }
+        );
+        this.medicalForm.get('endocrine').valueChanges.subscribe(
+            (endocrine: string) => {
+                if (endocrine) {
+                    this.setValidation('endocrineDescription');
+                } else {
+                    this.medicalForm.patchValue({ 'endocrineDescription': '' });
+                    this.disableValidation('endocrineDescription');
+                }
+            }
+        );
+        this.medicalForm.get('dietaryDentition').valueChanges.subscribe(
+            (dietaryDentition: string) => {
+                if (dietaryDentition) {
+                    this.setValidation('dietaryDentitionDescription');
+                } else {
+                    this.medicalForm.patchValue({ 'dietaryDentitionDescription': '' });
+                    this.disableValidation('dietaryDentitionDescription');
+                }
+            }
+        );
+        this.medicalForm.get('speech').valueChanges.subscribe(
+            (speech: string) => {
+                if (speech) {
+                    this.setValidation('speechDescription');
+                } else {
+                    this.medicalForm.patchValue({ 'speechDescription': '' });
+                    this.disableValidation('speechDescription');
+                }
+            }
+        );
+        this.medicalForm.get('skin').valueChanges.subscribe(
+            (skin: string) => {
+                if (skin) {
+                    this.setValidation('skinDescription');
+                } else {
+                    this.medicalForm.patchValue({ 'skinDescription': '' });
+                    this.disableValidation('skinDescription');
+                }
+            }
+        );
+        this.medicalForm.get('hearing').valueChanges.subscribe(
+            (hearing: string) => {
+                if (hearing) {
+                    this.setValidation('hearingDescription');
+                } else {
+                    this.medicalForm.patchValue({ 'hearingDescription': '' });
+                    this.disableValidation('hearingDescription');
+                }
+            }
+        );
+        this.medicalForm.get('vision').valueChanges.subscribe(
+            (vision: string) => {
+                if (vision) {
+                    this.setValidation('visionDescription');
+                } else {
+                    this.medicalForm.patchValue({ 'visionDescription': '' });
+                    this.disableValidation('visionDescription');
+                }
+            }
+        );
+        this.medicalForm.get('allergies').valueChanges.subscribe(
+            (allergies: string) => {
+                if (allergies) {
+                    this.setValidation('allergiesDescription');
+                } else {
+                    this.medicalForm.patchValue({ 'allergiesDescription': '' });
+                    this.disableValidation('allergiesDescription');
+                }
+            }
+        );
+        this.medicalForm.get('physicalAssessmentOther').valueChanges.subscribe(
+            (physicalAssessmentOther: string) => {
+                if (physicalAssessmentOther) {
+                    this.setValidation('physicalAssessmentOtherDescription');
+                } else {
+                    this.medicalForm.patchValue({ 'physicalAssessmentOtherDescription': '' });
+                    this.disableValidation('physicalAssessmentOtherDescription');
+                }
+            }
+        );
+
+
+        // Section 4
+        this.medicalForm.get('equipmentOther').valueChanges.subscribe(
+            (equipmentOther: string) => {
+                if (equipmentOther) {
+                    this.setValidation('equipmentOtherText');
+                } else {
+                    this.medicalForm.patchValue({ 'equipmentOtherText': '' });
+                    this.disableValidation('equipmentOtherText');
+                }
+            }
+        );
+        this.medicalForm.get('exceedCapacity').valueChanges.subscribe(
+            (exceedCapacity: string) => {
+                if (exceedCapacity === 'Y') {
+                    this.setValidation('exceedCapacityExplain');
+                } else {
+                    this.medicalForm.get('exceedCapacityExplain').setValidators([]);
+                }
+                this.medicalForm.get('exceedCapacityExplain').updateValueAndValidity();
+            }
+        );
+    }
+
+
+    medicalFormSaveSection(sectionnum: string) {
+        this.touchForm = true;
+        this.medicalFormSubmitSection(sectionnum);
+    }
+
+    medicalFormSubmitSection(sectionnum: string, allowSave?: boolean) {
+        if (allowSave === false) {
+            this.submitChecked = allowSave;
+        } else {
+            this.submitChecked = true;
+        }
+        this.dublicateAlert = false;
+        let screen;
+        if (sectionnum === 'section1') {
+            screen = 'isFirstScreenDone';
+        } else if (sectionnum === 'section2') {
+            screen = 'isSecondScreenDone';
+        } else if (sectionnum === 'section3') {
+            screen = 'isThirdScreenDone';
+        } else if (sectionnum === 'section4') {
+            screen = 'isFourthScreenDone';
+        } else if (sectionnum === 'section5') {
+            screen = 'isFifthScreenDone';
+        } else {
+            screen = 'isSixthScreenDone';
+        }
+        let sec = false;
+        const screenName = {};
+        const BreakException = {};
+        this.medicalForm.updateValueAndValidity();
+        try {
+            if (sectionnum === 'section1') {
+                this.formErrorData = [];
+                this.formSectionErrorData = null;
+                this.incompletedCurrentMedicalAxis = false;
+                this.incompletedCurrentMedications = false;
+
+
+                const diagnosesControl = <FormArray>this.medicalForm.get('diagnosesEntities');
+
+                if (diagnosesControl.length > 0) {
+                    for (let i = 0; i < diagnosesControl.length; i++) {
+
+                        if (diagnosesControl.value[i].description === null) {
+                            diagnosesControl.value[i].description = '';
+                        }
+                        if (diagnosesControl.value[i].onset === null) {
+                            diagnosesControl.value[i].onset = '';
+                        }
+                        if (diagnosesControl.value[i].history === null) {
+                            diagnosesControl.value[i].history = '';
+                        }
+                        if (diagnosesControl.value[i].prognosis === null) {
+                            diagnosesControl.value[i].prognosis = '';
+                        }
+
+                        if (diagnosesControl.value[i].description !== '' && diagnosesControl.value[i].onset !== '' &&
+                            diagnosesControl.value[i].history !== '' && diagnosesControl.value[i].prognosis !== '') {
+                            // Completed
+                        } else if (diagnosesControl.value[i].description !== '' || diagnosesControl.value[i].onset !== '' ||
+                            diagnosesControl.value[i].history !== '' || diagnosesControl.value[i].prognosis !== '') {
+                            this.incompletedCurrentMedicalAxis = true; // Partial
+                            this.formErrorData.push('You must fully enter <b>Current Medical Axis III</b> Diagnosis information');
+                            break;
+                        } else {
+                            // diagnosesControl.removeAt(i);
+                        }
+                    }
+                }
+
+                const medicationcontrol = <FormArray>this.medicalForm.get('currentMedEntities');
+                if (medicationcontrol.length > 0) {
+                    for (let i = 0; i < medicationcontrol.length; i++) {
+
+                        if (medicationcontrol.value[i].medication === null) {
+                            medicationcontrol.value[i].medication = '';
+                        }
+                        if (medicationcontrol.value[i].doseSchedule === null) {
+                            medicationcontrol.value[i].doseSchedule = '';
+                        }
+                        if (medicationcontrol.value[i].reason === null) {
+                            medicationcontrol.value[i].reason = '';
+                        }
+                        if (medicationcontrol.value[i].startDate === null) {
+                            medicationcontrol.value[i].startDate = '';
+                        }
+
+                        if (medicationcontrol.value[i].medication !== '' && medicationcontrol.value[i].doseSchedule !== '' &&
+                            medicationcontrol.value[i].reason !== '' && medicationcontrol.value[i].startDate !== '') {
+                            // Completed
+                        } else if (medicationcontrol.value[i].medication !== '' || medicationcontrol.value[i].doseSchedule !== '' ||
+                            medicationcontrol.value[i].reason !== '' || medicationcontrol.value[i].startDate !== '') {
+                            this.incompletedCurrentMedications = true; // Partial
+                            this.formErrorData.push('You must fully enter <b>Current Medications</b> information');
+                            break;
+                        } else {
+                            // medicationcontrol.removeAt(i);
+                        }
+                    }
+                }
+
+                if (this.incompletedCurrentMedicalAxis === true || this.incompletedCurrentMedications === true) {
+                    this.section1Invalid = true;
+                } else {
+                    this.section1Invalid = false;
+                }
+
+                if (this.formErrorData.length > 0) {
+                    if (!this.fromErrorFlag && !this.sectionFlag) {
+                        this.fromErrorFlag = true;
+                        // this.sectionFlag = true;
+                    }
+                    this.customError = true;
+                    const sectionError = {};
+                    sectionError[sectionnum] = this.formErrorData;
+                    this.formSectionErrorData = sectionError;
+                } else {
+                    this.customError = false;
+                    this.sectionFlag = false;
+                }
+            }
+
+            if (this.roleCD === 'assessor') {
+                Object.keys(this.medicalForm.controls).forEach(field => {
+                    const control = this.medicalForm.get(field);
+                    if (!control.valid) {
+                        sec = false;
+
+                        const list = document.getElementsByClassName(sectionnum + '_' + field);
+                        for (let i = 0; i < list.length; i++) {
+                            if (list[i].classList.contains(sectionnum + '_' + field)) {
+                                screenName[screen] = 'N';
+                                this.medicalForm.patchValue(screenName);
+                                throw BreakException;
+                            }
+                        }
+                    } else {
+                        sec = true;
+                        screenName[screen] = 'Y';
+                        this.medicalForm.patchValue(screenName);
+                    }
+
+                }
+                );
+            }
+        }
+        // tslint:disable-next-line:one-line
+        catch (e) {
+            if (e !== BreakException) {
+                throw e;
+            }
+        }
+
+        if ((sectionnum === 'section1' || sectionnum === 'section2' || sectionnum === 'section3'
+            || sectionnum === 'section4' || sectionnum === 'section5' || sectionnum === 'section6')
+            && this.section1Invalid === true) {
+            // this.errorPopup = 3;
+            sectionnum = 'section1';
+            this.isActive = 'section1';
+            // this.emptyForm = true;
+            this.saveMedical(false);
+        } else {
+            if (this.submitFromTab === true) {
+                this.isActive = this.nextSection;
+            }
+            this.emptyForm = false;
+            if (this.roleCD === 'assessor' && this.touchForm && this.submitChecked) {
+                this.saveMedical(false);
+            }
+        }
+
+        //if (this.roleCD === 'assessor') {
+        // this.saveMedical(false);
+        // }
+    }
+
+    saveMedical(checkValidation: boolean) {
+        this.spinnerFlag = true;
+        if (!checkValidation) {
+            if (this.medicalForm.get('submit').value === true) {
+                this.medicalForm.patchValue({ 'submit': false });
+            }
+        }
+        this.sub = this.activeRoute.params.subscribe(params => {
+            this.assessmentsId = Number(params['assessmentsId']);
+        });
+        this.medicalForm.patchValue({ 'assessmentsId': this.assessmentsId });
+        this.postService('saveMedical', this.medicalForm.getRawValue());
+        this.medicalForm.markAsPristine();
+        // this.constants.markAsUntouched(this.medicalForm);
+        if (this.touchForm) {
+            this.constants.markAsUntouched(this.medicalForm);
+            this.touchForm = true;
+        }
+    }
+
+    postService(name: string, postData: any) {
+        //this.postService('saveMedical', this.medicalForm.getRawValue());
+        this.fromErrorFlag = false;
+        if (postData.notSeen) {
+            postData.notSeen = 'Y';
+        } else {
+            postData.notSeen = 'N';
+        }
+
+        for (const key in postData) {
+            if (this.booleanFlags.indexOf(key) > -1) {
+                if (postData[key] === true) {
+                    postData[String(key)] = 'Y';
+                } else if (postData[key] === false || postData[key] === null) {
+                    postData[String(key)] = 'N';
+                }
+            }
+        }
+
+        if (postData.transfusionsDate instanceof Object) {
+            postData.transfusionsDate = this.dateService.getDate(postData.transfusionsDate);
+        }
+
+
+        if (postData.dialysisStartDate instanceof Object) {
+            postData.dialysisStartDate = this.dateService.getDate(postData.dialysisStartDate);
+        }
+
+        if (postData.examinationDate instanceof Object) {
+            postData.examinationDate = this.dateService.getDate(postData.examinationDate);
+        }
+
+        if (postData.tardiveDyskenesiaDate instanceof Object) {
+            postData.tardiveDyskenesiaDate = this.dateService.getDate(postData.tardiveDyskenesiaDate);
+        }
+
+        if (postData.physicalTherapyDate instanceof Object) {
+            postData.physicalTherapyDate = this.dateService.getDate(postData.physicalTherapyDate);
+        }
+
+        if (postData.occupationalTherapyDate instanceof Object) {
+            postData.occupationalTherapyDate = this.dateService.getDate(postData.occupationalTherapyDate);
+        }
+
+        if (postData.speechTherapyDate instanceof Object) {
+            postData.speechTherapyDate = this.dateService.getDate(postData.speechTherapyDate);
+        }
+
+        if (postData.respiratoryTherapyDate instanceof Object) {
+            postData.respiratoryTherapyDate = this.dateService.getDate(postData.respiratoryTherapyDate);
+        }
+
+
+        for (let j = 0; j < postData.currentMedEntities.length; j++) {
+            if (postData.currentMedEntities[j].startDate && postData.currentMedEntities[j].startDate instanceof Object) {
+                postData.currentMedEntities[j].startDate = this.dateService.getDate(postData.currentMedEntities[j].startDate);
+            }
+            if (postData.currentMedEntities[j].currentMedicationsId === '') {
+                postData.currentMedEntities[j].currentMedicationsId = null;
+            }
+            if (postData.currentMedEntities[j].medication === '' && postData.currentMedEntities[j].doseSchedule === '' &&
+                postData.currentMedEntities[j].reason === '' && postData.currentMedEntities[j].startDate === '') {
+                // delete postData.currentMedEntities[j];
+            }
+        }
+
+        for (let j = 0; j < postData.diagnosesEntities.length; j++) {
+            // postData.diagnosesEntities[j].description = postData.diagnosesEntities[j].description.id;
+            if (postData.diagnosesEntities[j].diagnosesId === '') {
+                postData.diagnosesEntities[j].diagnosesId = null;
+            }
+
+            if (postData.diagnosesEntities[j].description === '' && postData.diagnosesEntities[j].onset === '' &&
+                postData.diagnosesEntities[j].history === '' && postData.diagnosesEntities[j].prognosis === '') {
+                // delete postData.diagnosesEntities[j];
+            }
+        }
+
+        this.httpService.addRecord(name, postData).subscribe(res => {
+            const diagnosesEntitiesLength = <FormArray>this.medicalForm.controls['diagnosesEntities'];
+            const currentMedEntitiesLength = <FormArray>this.medicalForm.controls['currentMedEntities'];
+            if (res.global === 'successMsg@') {
+                this.medicalForm.patchValue({ 'versionNumber': res.data.versionNumber });
+                this.medicalForm.patchValue({ 'isOverriding': res.data.isOverriding });
+                this.showPrintBtn = this.constants.showHidePrint(res.data.medicalFormId);
+                this.spinnerFlag = false;
+                this.sectionFromErrorFlag = true;
+                this.fromErrorFlag = true;
+                this.edited = true;
+                this.constants.removeLocalStorage(this.assessIdCurrentUserID);
+                setTimeout(() => {
+                    this.sectionFromErrorFlag = false;
+                    this.edited = false;
+                    // this.fromErrorFlag = false;
+                }, 3000);
+                if (currentMedEntitiesLength.length > 0) {
+                    if (res.data.currentMedEntities && res.data.currentMedEntities.length > 0
+                        && res.data.currentMedEntities.length !== currentMedEntitiesLength.length) {
+                        this.currentMedEntitiesDubplicateRes(res.data);
+                        this.fromErrorFlag = true;
+                        this.edited = false;
+                        this.dublicateAlert = true;
+                        setTimeout(() => {
+                            this.fromErrorFlag = false;
+                            this.dublicateAlert = false;
+                        }, 3000);
+                        this.constants.removeLocalStorage(this.assessIdCurrentUserID);
+                    }
+                }
+
+                if (res.data.submit === true) {
+                    this.generateLetter();
+                    this.router.navigateByUrl('/dashboard/assessmentDashboard');
+                }
+                if (res.data.diagnosesEntities && (res.data.diagnosesEntities[0] !== null)) {
+                    for (const key in res.data.diagnosesEntities) {
+                        if (typeof res.data.diagnosesEntities[key]['icdDiagnoses'] === 'object') {
+                            res.data.diagnosesEntities[key]['icdDiagnoses'] = null;
+                        }
+                    }
+                }
+                this.currentDiagnosis(res.data);
+                this.currentMedEntities(res.data);
+
+            } else if (res.global === this.constants.ERROR_MSG && res.inline) {
+                this.denySave = true;
+                this.spinnerFlag = false;
+            } else {
+                this.router.navigate(['/internalserver']);
+            }
+        }, error => {
+            this.spinnerFlag = false;
+            // console.log(error);
+        });
+    }
+    sectionnum(param: string, allowNavigation?: boolean) {
+        if (this.roleCD !== 'assessor') {
+            this.isActive = param;
+        } else {
+            this.submitFromTab = true;
+            this.nextSection = param;
+            if (this.sectionFlag) {
+                this.touchForm = false;
+                this.medicalFormSubmitSection(this.isActive);
+            } else {
+                this.medicalFormSubmitSection(this.isActive);
+            }
+        }
+    }
+
+    icdBlur(currentVal: any, loc: any) {
+        let listArr = [];
+        let currentDiagnosisId = 0;
+        if (this.items1) {
+            listArr = this.items1;
+        }
+
+        const control = <FormArray>this.medicalForm.controls['diagnosesEntities'];
+        let prevDesc = '';
+        // if (this.medicalInfo > 0)
+        //  if ((this.medicalInfo > 0) && loc < this.medicalInfo['diagnosesEntities'].length) {
+        //     prevDesc = this.medicalInfo['diagnosesEntities'][loc].description;
+        // }
+        if (loc < this.medicalInfo['diagnosesEntities'].length) {
+            prevDesc = this.medicalInfo['diagnosesEntities'][loc].description;
+        }
+
+        currentDiagnosisId = control.value[loc].icdDiagnosesId;
+
+        if (prevDesc !== '') {
+            if (currentVal !== prevDesc) {
+                if (listArr.indexOf(currentVal) === -1 || currentDiagnosisId === 0 || currentDiagnosisId === null) {
+                    // control.controls[loc].get('description').setValue('');
+                    if (this.icdlookup[loc] !== currentVal) {
+                        control.controls[loc].get('description').setValue('');
+                        control.controls[loc].get('icdDiagnosesId').setValue('');
+                    }
+                } else {
+                    this.icdlookup[loc] = currentVal;
+                }
+            }
+        } else if (listArr.indexOf(currentVal) === -1 || currentDiagnosisId === 0 || currentDiagnosisId === null) {
+            // control.controls[loc].get('description').setValue('');
+            if (this.icdlookup[loc] !== currentVal) {
+                control.controls[loc].get('description').setValue('');
+                control.controls[loc].get('icdDiagnosesId').setValue('');
+            }
+        } else {
+            this.icdlookup[loc] = currentVal;
+        }
+
+    }
+
+    onclicksection(section: any) {
+        this.submitFromTab = false;
+        if (section === 'section1') {
+            this.isActive = 'section2';
+            this.medicalForm.patchValue({ 'section': 2 });
+            this.medicalFormSaveSection('section1');
+        } else if (section === 'section2') {
+            this.isActive = 'section3';
+            this.medicalForm.patchValue({ 'section': 3 });
+            this.medicalFormSaveSection('section2');
+        } else if (section === 'section3') {
+            this.isActive = 'section4';
+            this.medicalForm.patchValue({ 'section': 4 });
+            this.medicalFormSaveSection('section3');
+        } else if (section === 'section4') {
+            this.isActive = 'section5';
+            this.medicalForm.patchValue({ 'section': 5 });
+            this.medicalFormSaveSection('section4');
+        } else if (section === 'section5') {
+            this.isActive = 'section6';
+            this.medicalForm.patchValue({ 'section': 6 });
+            this.medicalFormSaveSection('section5');
+        }
+    }
+
+    changeStartDate(event: any, currentIndex: number) {
+        this.StartInvalidDate = false;
+        this.StartFutureDateFlag = false;
+        const today_date = this.dateService.today_Date();
+        let startDate: any;
+        let control = <FormArray>this.medicalForm.controls['currentMedEntities'];
+        const datelength = event.target.value + '';
+        if (datelength.length >= 9) {
+            startDate = event.target.value;
+            if (this.dateService.compareDates(event.target.value, today_date)) {
+                this.StartFutureDateFlag = true;
+            } else {
+                this.StartFutureDateFlag = false;
+            }
+        } else {
+            if (!this.dateService.validDate(this.dateService.formatDate(this.dateService.doDateFormat(event.target)))) {
+                startDate = this.dateService.formatDate(this.dateService.doDateFormat(event.target));
+                this.StartInvalidDate = true;
+            } else {
+                this.StartInvalidDate = false;
+                startDate =
+                    this.dateService.assignDate(this.dateService.formatDate(this.dateService.doDateFormat(event.target)));
+            }
+            if (this.dateService.compareDates(this.dateService.formatDate(this.dateService.doDateFormat(event.target)), today_date)) {
+                this.StartFutureDateFlag = true;
+            } else {
+                this.StartFutureDateFlag = false;
+            }
+        }
+        const formatedatelength = startDate + '';
+        if (formatedatelength.length >= 9) {
+            control.value[currentIndex].startDate = startDate;
+        } else {
+            control.value[currentIndex].startDate = '';
+        }
+        this.medicalForm.patchValue({ 'currentMedEntities': control.value });
+    }
+
+    onClickSectionBack(section: any) {
+        this.submitFromTab = false;
+        if (section === 'section2') {
+            this.medicalForm.patchValue({ 'section': 1 });
+            this.medicalFormSaveSection('section2');
+            this.isActive = 'section1';
+        } else if (section === 'section3') {
+            this.medicalForm.patchValue({ 'section': 2 });
+            this.medicalFormSaveSection('section3');
+            this.isActive = 'section2';
+        } else if (section === 'section4') {
+            this.medicalForm.patchValue({ 'section': 3 });
+            this.medicalFormSaveSection('section4');
+            this.isActive = 'section3';
+        } else if (section === 'section5') {
+            this.medicalForm.patchValue({ 'section': 4 });
+            this.medicalFormSaveSection('section5');
+            this.isActive = 'section4';
+        } else if (section === 'section6') {
+            this.medicalForm.patchValue({ 'section': 5 });
+            this.medicalFormSaveSection('section6');
+            this.isActive = 'section5';
+        }
+    }
+
+    generateLetter() {
+        this.constants.generateLetter(this.assessmentsId, this.constants.SEVEN);
+    }
+
+    closeuploadModal() {
+        this.modalRef.hide();
+    }
+    routeToHome() {
+        this.router.navigate(['/dashboard/']);
+    }
+    formservice() {
+        let role: string;
+        this.spinnerFlag = true;
+        this.httpService.getRecord('getMedicalFormView?medicalFormId=0&assessmentsId=' + this.assessmentsId).subscribe(res => {
+            if (res.global === 'successMsg@') {
+                this.showPrintBtn = this.constants.showHidePrint(res.data.medicalFormId);
+                this.loadData(res.data, role);
+            } else {
+                console.log('error');
+            }
+        }, error => {
+            console.log(error);
+        });
+    }
+    loadData(data: any, role: string) {
+        this.medicalInfo = data;
+        for (const key in this.medicalInfo) {
+            if (this.booleanFlags.indexOf(key) > -1) {
+                if (this.medicalInfo[key] === 'N') {
+                    this.medicalInfo[String(key)] = false;
+                } else if (this.medicalInfo[key] === 'Y') {
+                    this.medicalInfo[String(key)] = true;
+                }
+            }
+        }
+        if (data.isAssessorView.coordinator === 'Y') {
+            role = 'coordinator';
+        } else if (data.isAssessorView.isAssessor === true) {
+            role = 'assessor';
+        } else if (data.isAssessorView.isCS === true) {
+            role = 'countersignee';
+        } else if (data.isAssessorView.reviewer === true) {
+            role = 'reviewer';
+        } else {
+            role = 'admin';
+        }
+
+        if (data.isAssessorView.countersigneeExists) {
+            this.countersigneeExists = data.isAssessorView.countersigneeExists;
+        }
+
+        if (data.clientName) {
+            const name: string = data.clientName.substring(1).slice(0, -1);
+            this.lastName = name.split(',')[0];
+            if (name.split(',')[1]) {
+                this.suffixName = name.split(',')[1];
+            } else {
+                this.suffixName = '';
+            }
+            this.firstName = name.split(',')[2];
+        }
+
+        if (data.isAssessorView.evaluationStatus === true) {
+            if (role !== 'reviewer') {
+                this.evaluationStatus(data);
+            }
+            this.pending = true;
+        }
+
+        const optPsyLogicalTests = ['empty', 'medicalFormId'];
+        if (data.currentMedEntities.length > 0) {
+            this.noItems = false;
+        } else {
+            this.noItems = true;
+        }
+        this.currentDiagnosis(data);
+        this.currentMedEntities(data);
+        data.transfusionsDate = this.setValidDate(data.transfusionsDate);
+        data.dialysisStartDate = this.setValidDate(data.dialysisStartDate);
+        data.physicalTherapyDate = this.setValidDate(data.physicalTherapyDate);
+        data.occupationalTherapyDate = this.setValidDate(data.occupationalTherapyDate);
+        data.speechTherapyDate = this.setValidDate(data.speechTherapyDate);
+        data.respiratoryTherapyDate = this.setValidDate(data.respiratoryTherapyDate);
+        data.examinationDate = this.setValidDate(data.examinationDate);
+
+        if (!this.isActive && data.section) {
+            if (role === 'assessor') {
+                this.isActive = 'section' + data.section;
+            } else {
+                this.isActive = 'section1';
+            }
+        }
+        if (data[this.constants.REJECTION_COMMENTS] !== null && data[this.constants.REJECTION_COMMENTS] !== undefined) {
+            this.showhiderejcom = true;
+        }
+        this.digitallySignedBy = data.isAssessorView.signeQualifications;
+        this.digitallySignedDate = data.isAssessorView.signedDate;
+        this.digitallyCounterSignedBy = data.isAssessorView.csQualifications;
+        this.digitallyCounterSignedDate = data.isAssessorView.counterSignedDate;
+        this.evaluationId = data.evaluationId;
+
+        switch (role) {
+            case 'countersignee': {
+                this.roleCD = role;
+                this.countersignee(data);
+                break;
+            }
+            case 'assessor': {
+                this.roleCD = role;
+                this.assessor(data);
+                break;
+            }
+            case 'coordinator': {
+                this.roleCD = role;
+                this.coordinator(data);
+                break;
+            }
+            case 'reviewer': {
+                this.roleCD = role;
+                this.reviewer(data);
+                break;
+            }
+            default: {
+                this.roleCD = role;
+                this.default(data);
+                break;
+            }
+        }
+        this.status = this.medicalForm.controls.status.value;
+        this.counterSigneeId = this.medicalForm.controls.counterSigneeId.value;
+    }
+    default(data: any) {
+        this.medicalForm.disable();
+        this.checkDateDisabled = true;
+        (<FormGroup>this.medicalForm).patchValue(data, { onlySelf: true });
+        this.spinnerFlag = false;
+    }
+    countersignee(data: any) {
+        (<FormGroup>this.medicalForm).patchValue(data, { onlySelf: true });
+        this.medicalForm.disable();
+        this.checkDateDisabled = true;
+        this.medicalForm.get('csNotes').enable();
+        this.medicalForm.get('submit').enable();
+        this.spinnerFlag = false;
+    }
+
+    setValidDate(dateVal: any) {
+        if (dateVal) {
+            if (typeof dateVal === 'object') {
+                dateVal = this.dateService.getDate(dateVal);
+            } else {
+                dateVal = this.dateService.assignDate(dateVal);
+            }
+        }
+        return dateVal;
+    }
+    textlengthcount(event: any) {
+        const element = event.target || event.srcElement;
+        const count = element.previousElementSibling;
+        const value = element.value.length;
+        if (value >= 0) {
+            this.characterleft = this.maxlength - value;
+        }
+    }
+    mouseentercount(event: any) {
+        const element = event.target || event.srcElement;
+        const count = element.previousElementSibling;
+        const value = element.value.length;
+        if (value >= 0) {
+            this.characterleft = this.maxlength - value;
+        }
+        count.style.display = 'block';
+    }
+    mouseleavecount(event: any) {
+        const element = event.target || event.srcElement;
+        const count = element.previousElementSibling;
+        count.style.display = 'none';
+    }
+
+    assessor(data: any) {
+
+        this.medicalForm.patchValue({ 'examinationDate': this.setValidDate(data.examinationDate) });
+        this.medicalForm.patchValue({ 'tardiveDyskenesiaDate': this.setValidDate(data.tardiveDyskenesiaDate) });
+
+        // delete data['isAssessorView'];
+        delete data['errors'];
+
+        (<FormGroup>this.medicalForm).patchValue(data, { onlySelf: true });
+        // this.medicalForm.get('csNotes').disable();
+        this.spinnerFlag = false;
+    }
+
+    coordinator(data: any) {
+        (<FormGroup>this.medicalForm).patchValue(data, { onlySelf: true });
+        this.medicalForm.disable();
+        this.checkDateDisabled = true;
+        this.medicalForm.get('submit').enable();
+        this.spinnerFlag = false;
+    }
+
+    /*Approve Reject Start */
+
+    reject(param: string) {
+        this.emptyForm = false;
+        this.fromErrorFlag = false;
+        this.formErrorData = [];
+        if (param !== '' && param !== undefined) {
+            if (this.roleCD === 'countersignee') {
+                this.approveReject('rejectAssessmentForm', 'N', param);
+            } else {
+                this.approveReject('rejectAssessmentForm', 'Y', param);
+            }
+        } else if (this.rejecttextbox) {
+            // this.errorPopup = 4;
+            // this.emptyForm = true;
+            this.fromErrorFlag = true;
+            this.formErrorData.push(this.constants.REJECTION_COMMENTS_REQ);
+        }
+        this.rejecttextbox = true;
+    }
+
+    approveReject(approveReject: string, coordinator: string, retectText?: string) {
+        this.spinnerFlag = true;
+        this.constants.approveReject(approveReject, this.roleCD, this.evaluationId, coordinator,
+            'MedicalFormEntity', this.assessmentsId, retectText);
+    }
+
+    approve() {
+        this.fromErrorFlag = false;
+        this.formErrorData = [];
+        if (this.medicalForm.get('submit').value) {
+            this.spinnerFlag = true;
+            this.approveReject('approveAssessmentForm', 'Y', null);
+        } else {
+            const control = this.medicalForm.get('submit');
+            control.markAsTouched({ onlySelf: true });
+            this.fromErrorFlag = true;
+            this.formErrorData.push(this.constants.DIGITAL_SIGNATURE);
+        }
+    }
+
+    /*Approve reject End */
+
+    UploadFileChange(event) {
+        this.fileFormData = new FormData();
+        if (event.target.files.length > 0) {
+            this.UploadDocType = 'File';
+            const fileList: FileList = event.target.files;
+            for (let i = 0; i < fileList.length; i++) {
+                this.UploadFileData.append('uploadFile', fileList[i], fileList[i]['name']);
+                if (i === 0) {
+                    this.uploadDocumentForm.value.Upload = fileList[i]['name'];
+                } else {
+                    this.uploadDocumentForm.value.Upload = this.uploadDocumentForm.value.Upload + ',' + fileList[i]['name'];
+                }
+            }
+            this.UploadFileData.append('docType', this.UploadDocType);
+            this.UploadFileData.append('assessmentId', this.assessmentsId);
+        }
+    }
+
+    uploadDocument(FcontrolName) {
+        this.fileFormData = new FormData();
+        this.spinnerFlag = true;
+        if (FcontrolName === 'Upload') {
+            this.fileFormData = this.UploadFileData;
+        }
+    }
+
+    closeErrorPopup() {
+        this.emptyForm = false;
+    }
+
+    deleteDocument(val, name) {
+        this.deleteFileData = new FormData();
+        let fileId: any;
+        if (val === 'Upload') {
+            this.UploadDocType = 'File';
+            fileId = this.jsonData[name];
+        }
+
+        this.spinnerFlag = true;
+    }
+    updateFormFields(strings: string, e: any) {
+    }
+    reviewer(data: any) {
+        this.medicalForm.disable();
+        (<FormGroup>this.medicalForm).patchValue(data, { onlySelf: true });
+        this.evaluationStatus(data);
+    }
+
+    evaluationStatus(data: any) {
+        this.spinnerFlag = true;
+        for (let i = 0; i < this.medicalPend.pending.length; i++) {
+            this.medicalPend.pending[i]['assessmentFormId'] = data.medicalFormId;
+        }
+        this.httpService.getRecord('grabHighlights?evalId=' + data.evaluationId + '&formId=' + data.medicalFormId
+            + '&formType=medical').subscribe(res => {
+                if (res.global === 'successMsg@') {
+                    if (res.data.length > 0) {
+                        for (let i = 0; i < this.medicalPend.pending.length; i++) {
+                            if (res.data.length === 1 && !res.data[0]['assessmentFormId']) {
+                                this.medicalPend.pending[i]['pendingsId'] = res.data[0]['pendingsId'];
+                            } else {
+                                for (let j = 0; j < res.data.length; j++) {
+                                    for (let k = 0; k < this.medicalPend.pending.length; k++) {
+                                        if (res.data[j]['assessmentFieldId'] === this.medicalPend.pending[k]['assessmentFieldId']) {
+                                            this.medicalPend.pending[k]['assessmentFieldComment'] = res.data[j]['assessmentFieldComment'];
+                                        }
+                                        this.medicalPend.pending[k]['pendingsId'] = res.data[0]['pendingsId'];
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    this.pend = data.isAssessorView.reviewer;
+                } else {
+                    console.log('error');
+                }
+                for (let i = 0; i < this.medicalPend.pending.length; i++) {
+                    if (this.roleCD === 'reviewer') {
+                        document.getElementsByClassName(this.medicalPend.pending[i]['assessmentFieldId'])
+                        [0].appendChild(document.getElementById('pendData' + i));
+                    } else if (this.medicalPend.pending[i]['assessmentFieldComment']) {
+                        document.getElementsByClassName(this.medicalPend.pending[i]['assessmentFieldId'])
+                        [0].appendChild(document.getElementById('pendData' + i));
+                    }
+                }
+            }, error => {
+                console.log(error);
+            }, () => {
+                this.spinnerFlag = false;
+            });
+    }
+
+    saveHighlight() {
+        let temp = [];
+        this.pendError = false;
+        this.fromErrorFlag = false;
+        this.sectionFlag = false;
+        if (this.constants.savePendingHightlights(this.medicalPend, this.elem)) {
+            this.spinnerFlag = true;
+            for (let i = this.medicalPend.pending.length - 1; i >= 0; i--) {
+                if (this.medicalPend.pending[i]['assessmentFieldComment'] !== '') {
+                    temp.unshift(this.medicalPend.pending[i]);
+                }
+            }
+            this.httpService.addRecord('saveHighlight', temp).subscribe(res => {
+                if (res.global === 'successMsg@') {
+                    this.router.navigate(['/dashboard/evaluationdashboard/pendingevaluation/' + this.evaluationId]);
+                } else {
+                    this.router.navigate(['/internalserver']);
+                }
+            }, error => {
+            }, () => {
+                this.spinnerFlag = false;
+            });
+        } else {
+            this.fromErrorFlag = true;
+            this.pendError = true;
+        }
+    }
+    cancel(val: any) {
+        if ('popup' === val) {
+            this.popup(this.loadCancel);
+        }
+        if (val === true && this.roleCD !== 'coordinator') {
+            this.router.navigate(['/dashboard/assessmentDashboard']);
+        } else if (val === true && this.roleCD === 'coordinator') {
+            this.router.navigateByUrl('dashboard/evaluationdashboard/createevaluation/' + this.evaluationId);
+        } else {
+            this.modalRef.hide();
+        }
+    }
+    reset(val: any) {
+        if ('popup' === val) {
+            this.popup(this.resetData);
+        }
+        if (val === true) {
+            this.modalRef.hide();
+            this.formservice();
+        }
+    }
+    popup(load: any) {
+        this.modalRef = this.modalService.show(load, { ignoreBackdropClick: true });
+    }
+    loadLocalData(load: boolean) {
+        if (load) {
+            let role: string;
+            this.spinnerFlag = true;
+            this.loadData(this.constants.getLocalStorage(this.assessIdCurrentUserID, 'medical'), role);
+            this.modalRef.hide();
+        } else {
+            this.modalRef.hide();
+            this.formservice();
+        }
+    }
+    ngOnChanges() {
+        this.medicalForm.valueChanges.subscribe(val => {
+            //     if (this.roleCD === 'assessor' && this.medicalForm.dirty) {
+            //         const ciphertext = CryptoJS.AES.encrypt(JSON.stringify(this.medicalForm.getRawValue()), 'medical', 256);
+            //         localStorage.setItem(this.assessIdCurrentUserID, ciphertext);
+            //     }
+            this.constants.formChanges(this.roleCD, this.assessIdCurrentUserID, this.medicalForm, 'medical');
+        });
+    }
+
+    public restrictNumebers(field, value) {
+
+        if (value.toString().length === 2) {
+            this.medicalForm.controls[field].setValue(value.toString().charAt(0));
+        } else {
+            if (value >= 0 && value < 5) {
+                if (!value.toString().charCodeAt(0)) {
+                    this.medicalForm.controls[field].setValue('');
+                }
+                // Do Nothing
+            } else {
+                this.medicalForm.controls[field].setValue('');
+            }
+        }
+    }
+    uploadDocuments() {
+        this.uploadModal.show();
+        this.uploadFileChange = {
+            'evaluationId': this.evaluationId
+        };
+    }
+    sectionFormControl(section: string, validation?: any) {
+        // if user accidentally omits the new keyword, this will
+        // silently correct the problem...
+        if (!(this instanceof SectionFormControl)) {
+            return new SectionFormControl(section, validation);
+        }
+    }
+    closeuploadDocModal(event: any) {
+        this.uploadModal.hide();
+    }
+
+    currentDiagnosis(data: any) {
+        const optPsyLogicalTests = ['empty', 'medicalFormId'];
+        if (data.diagnosesEntities && (data.diagnosesEntities[0] !== null)) {
+            for (let j = 0; j < data.diagnosesEntities.length; j++) {
+                for (let i = 0; i < optPsyLogicalTests.length; i++) {
+                    delete data.diagnosesEntities[j][optPsyLogicalTests[i]];
+                }
+            }
+            if (data['diagnosesEntities'].length > 0) {
+
+                const controlArray = <FormArray>this.medicalForm.controls['diagnosesEntities'];
+                controlArray.controls = [];
+                data.diagnosesEntities.forEach(app => {
+                    const fb = this.initdiagnosesEntities();
+                    fb.patchValue(app);
+                    controlArray.push(fb);
+                });
+            } else if (data.diagnosesEntities.length === 0 || data.diagnosesEntities.length === undefined) {
+                data.diagnosesEntities = [{
+                    description: '', onset: '', history: '', prognosis: ''
+                }];
+            }
+        } else {
+            data.diagnosesEntities = [{
+                description: '', onset: '', history: '', prognosis: '', diagnosesId: ''
+            }];
+        }
+    }
+    currentMedEntities(data: any) {
+        const optPsyLogicalTests = ['empty', 'medicalFormId'];
+        if (data.currentMedEntities) {
+            for (let j = 0; j < data.currentMedEntities.length; j++) {
+                if (!(data.currentMedEntities[j].startDate instanceof Object)) {
+                    data.currentMedEntities[j].startDate = this.setValidDate(data.currentMedEntities[j].startDate);
+                }
+
+                for (let i = 0; i < optPsyLogicalTests.length; i++) {
+                    delete data.currentMedEntities[j][optPsyLogicalTests[i]];
+                }
+            }
+            if (data.currentMedEntities.length > 0) {
+                const currentMedArr = <FormArray>this.medicalForm.controls['currentMedEntities'];
+                currentMedArr.controls = [];
+                data.currentMedEntities.forEach(app => {
+                    //app.startDate = this.setValidDate(app.startDate);
+                    const fb = this.initcurrentMedEntities();
+                    fb.patchValue(app);
+                    currentMedArr.push(fb);
+                });
+                // for (let i = 0; i < data.currentMedEntities.length - 1; i++) {
+                //     control.push(this.initcurrentMedEntities());
+                // }
+            } else if (data.currentMedEntities.length === 0 || data.currentMedEntities.length === undefined) {
+                data.currentMedEntities = [{
+                    medication: '', doseSchedule: '', reason: '', startDate: '', currentMedicationsId: ''
+                }];
+            }
+        } else {
+            data.currentMedEntities = [{
+                medication: '', doseSchedule: '', reason: '', startDate: '', currentMedicationsId: ''
+            }];
+        }
+    }
+    currentDiagnosisDubplicateRes(data: any) {
+        const control = <FormArray>this.medicalForm.controls['diagnosesEntities'];
+        for (let i = control.length - 1; i >= 0; i--) {
+            control.removeAt(i);
+        }
+        control.reset();
+        control.push(this.initdiagnosesEntities());
+        this.currentDiagnosis(data);
+        this.medicalForm.patchValue({ 'diagnosesEntities': data.diagnosesEntities });
+    }
+    currentMedEntitiesDubplicateRes(data: any) {
+        const control = <FormArray>this.medicalForm.controls['currentMedEntities'];
+        for (let i = control.length - 1; i >= 0; i--) {
+            control.removeAt(i);
+        }
+        control.reset();
+        control.push(this.initcurrentMedEntities());
+        this.currentMedEntities(data);
+        this.medicalForm.patchValue({ 'currentMedEntities': data.currentMedEntities });
+    }
+    FormErrorOnNotify(data: any) {
+        this.sectionFlag = false;
+        this.fromErrorFlag = false;
+        this.formErrorData = [];
+    }
+    navigateSection(param: string) {
+        // this.sectionnum(param);
+        this.isActive = param;
+        // this.sectionFlag = false;
+    }
+    close() {
+        this.constants.close(this.evaluationId);
+    }
+    makeActive(section: any) {
+        this.isActive = section;
+    }
+    evalDetailsScreen() {
+        this.router.navigateByUrl(this.constants.CREATE_EVAL_SCREEN + this.evaluationId);
+    }
+    ngOnDestroy() {
+        this.constants.hideModel(this.modalRef);
+        this.constants.pendingSave = [];
+    }
+
+    canDeactivate() {
+        // this.saveMedical(false);
+        this.medicalFormSaveSection(this.isActive);
+    }
+    saveExistingForm() {
+        let role;
+        this.router.navigate(['dashboard/assessmentDashboard/medical/' + this.newAssessmentId]);
+        this.loadData(this.constants.getLocalStorage(this.assessIdCurrentUserID, 'medical'), role);
+    }
+    removeExistingForm() {
+        this.constants.removeLocalStorage(this.assessIdCurrentUserID);
+        this.formservice();
+    }
+    onlyNumberKey(event) {
+        if (event.charCode >= 47 && event.charCode <= 57) {
+            if (event.target.value.length < 10) {
+                this.dateService.doFormat(event.target);
+            } else {
+                return false;
+            }
+        } else {
+            return event.charCode === 8 || event.charCode === 0
+                ? null
+                : event.charCode >= 47 && event.charCode <= 57;
+        }
+    }
+    removeTabindex(addByClass) {
+        setTimeout(function () {
+            const temp = document.querySelectorAll('.' + addByClass);
+            for (let i = 0; i < temp.length; i++) {
+                temp[i].setAttribute('tabindex', '-1');
+            }
+        }, 10);
+    }
+
+    ChangeBirthDate(event: any) {
+        this.invalidDate = false;
+        this.futureDateFlag = false;
+        const today_date = this.dateService.today_Date();
+        if (this.medicalForm.value.examinationDate) {
+            if (this.dateService.compareDates(this.medicalForm.value.examinationDate.formatted, today_date)) {
+                this.futureDateFlag = true;
+            } else {
+                this.futureDateFlag = false;
+            }
+        } else {
+            if (event.target.value) {
+                let changeDate: any;
+                if (!this.dateService.validDate(this.dateService.formatDate(this.dateService.doDateFormat(event.target)))) {
+                    changeDate = this.dateService.formatDate(this.dateService.doDateFormat(event.target));
+                    this.invalidDate = true;
+                } else {
+                    this.invalidDate = false;
+                    changeDate =
+                        this.dateService.assignDate(this.dateService.formatDate(this.dateService.doDateFormat(event.target)));
+
+                }
+                this.medicalForm.patchValue({ 'examinationDate': changeDate });
+                if (this.dateService.compareDates(this.dateService.formatDate(this.dateService.doDateFormat(event.target)), today_date)) {
+                    this.futureDateFlag = true;
+                } else {
+                    this.futureDateFlag = false;
+                }
+            } else {
+                this.medicalForm.patchValue({ 'examinationDate': '' });
+            }
+        }
+    }
+    ChangetardiveDyskenesiaDate(event: any) {
+        this.tardiveDyskenesiaInvalidDate = false;
+        this.tardiveDyskenesiaDateFutureFlag = false;
+        const today_date = this.dateService.today_Date();
+        if (this.medicalForm.value.tardiveDyskenesiaDate) {
+            if (this.dateService.compareDates(this.medicalForm.value.tardiveDyskenesiaDate.formatted, today_date)) {
+                this.tardiveDyskenesiaDateFutureFlag = true;
+            } else {
+                this.tardiveDyskenesiaDateFutureFlag = false;
+            }
+        } else {
+            if (event.target.value) {
+                let changeDate: any;
+                if (!this.dateService.validDate(this.dateService.formatDate(this.dateService.doDateFormat(event.target)))) {
+                    changeDate = this.dateService.formatDate(this.dateService.doDateFormat(event.target));
+                    this.tardiveDyskenesiaInvalidDate = true;
+                } else {
+                    this.tardiveDyskenesiaInvalidDate = false;
+                    changeDate =
+                        this.dateService.assignDate(this.dateService.formatDate(this.dateService.doDateFormat(event.target)));
+
+                }
+                this.medicalForm.patchValue({ 'tardiveDyskenesiaDate': changeDate });
+                if (this.dateService.compareDates(this.dateService.formatDate(this.dateService.doDateFormat(event.target)), today_date)) {
+                    this.tardiveDyskenesiaDateFutureFlag = true;
+                } else {
+                    this.tardiveDyskenesiaDateFutureFlag = false;
+                }
+            } else {
+                this.medicalForm.patchValue({ 'tardiveDyskenesiaDate': '' });
+            }
+        }
+    }
+    ChangeTransfusionsDate(event: any) {
+        this.TransfusionsInvalidDate = false;
+        this.TransfusionsFutureDateFlag = false;
+        const today_date = this.dateService.today_Date();
+        if (this.medicalForm.value.transfusionsDate) {
+            if (this.dateService.compareDates(this.medicalForm.value.transfusionsDate.formatted, today_date)) {
+                this.TransfusionsFutureDateFlag = true;
+            } else {
+                this.TransfusionsFutureDateFlag = false;
+            }
+        } else {
+            if (event.target.value) {
+                let changeDate: any;
+                if (!this.dateService.validDate(this.dateService.formatDate(this.dateService.doDateFormat(event.target)))) {
+                    changeDate = this.dateService.formatDate(this.dateService.doDateFormat(event.target));
+                    this.TransfusionsInvalidDate = true;
+                } else {
+                    this.TransfusionsInvalidDate = false;
+                    changeDate =
+                        this.dateService.assignDate(this.dateService.formatDate(this.dateService.doDateFormat(event.target)));
+
+                }
+                this.medicalForm.patchValue({ 'transfusionsDate': changeDate });
+                if (this.dateService.compareDates(this.dateService.formatDate(this.dateService.doDateFormat(event.target)), today_date)) {
+                    this.TransfusionsFutureDateFlag = true;
+                } else {
+                    this.TransfusionsFutureDateFlag = false;
+                }
+            } else {
+                this.medicalForm.patchValue({ 'transfusionsDate': '' });
+            }
+        }
+    }
+    ChangeDialysisDate(event: any) {
+        this.DialysisInvalidDate = false;
+        this.DialysisFutureDateFlag = false;
+        const today_date = this.dateService.today_Date();
+        if (this.medicalForm.value.dialysisStartDate) {
+            if (this.dateService.compareDates(this.medicalForm.value.dialysisStartDate.formatted, today_date)) {
+                this.DialysisFutureDateFlag = true;
+            } else {
+                this.DialysisFutureDateFlag = false;
+            }
+        } else {
+            if (event.target.value) {
+                let changeDate: any;
+                if (!this.dateService.validDate(this.dateService.formatDate(this.dateService.doDateFormat(event.target)))) {
+                    changeDate = this.dateService.formatDate(this.dateService.doDateFormat(event.target));
+                    this.DialysisInvalidDate = true;
+                } else {
+                    this.DialysisInvalidDate = false;
+                    changeDate =
+                        this.dateService.assignDate(this.dateService.formatDate(this.dateService.doDateFormat(event.target)));
+
+                }
+                this.medicalForm.patchValue({ 'dialysisStartDate': changeDate });
+                if (this.dateService.compareDates(this.dateService.formatDate(this.dateService.doDateFormat(event.target)), today_date)) {
+                    this.DialysisFutureDateFlag = true;
+                } else {
+                    this.DialysisFutureDateFlag = false;
+                }
+            } else {
+                this.medicalForm.patchValue({ 'dialysisStartDate': '' });
+            }
+        }
+    }
+    ChangePhysicalDate(event: any) {
+        this.PhysicalInvalidDate = false;
+        this.PhysicalFutureDateFlag = false;
+        const today_date = this.dateService.today_Date();
+        if (this.medicalForm.value.physicalTherapyDate) {
+            if (this.dateService.compareDates(this.medicalForm.value.physicalTherapyDate.formatted, today_date)) {
+                this.PhysicalFutureDateFlag = true;
+            } else {
+                this.PhysicalFutureDateFlag = false;
+            }
+        } else {
+            if (event.target.value) {
+                let changeDate: any;
+                if (!this.dateService.validDate(this.dateService.formatDate(this.dateService.doDateFormat(event.target)))) {
+                    changeDate = this.dateService.formatDate(this.dateService.doDateFormat(event.target));
+                    this.PhysicalInvalidDate = true;
+                } else {
+                    this.PhysicalInvalidDate = false;
+                    changeDate =
+                        this.dateService.assignDate(this.dateService.formatDate(this.dateService.doDateFormat(event.target)));
+
+                }
+                this.medicalForm.patchValue({ 'physicalTherapyDate': changeDate });
+                if (this.dateService.compareDates(this.dateService.formatDate(this.dateService.doDateFormat(event.target)), today_date)) {
+                    this.PhysicalFutureDateFlag = true;
+                } else {
+                    this.PhysicalFutureDateFlag = false;
+                }
+            } else {
+                this.medicalForm.patchValue({ 'physicalTherapyDate': '' });
+            }
+        }
+    }
+    ChangeOccupationalDate(event: any) {
+        this.occupationalInvalidDate = false;
+        this.occupationalFutureDateFlag = false;
+        const today_date = this.dateService.today_Date();
+        if (this.medicalForm.value.occupationalTherapyDate) {
+            if (this.dateService.compareDates(this.medicalForm.value.occupationalTherapyDate.formatted, today_date)) {
+                this.occupationalFutureDateFlag = true;
+            } else {
+                this.occupationalFutureDateFlag = false;
+            }
+        } else {
+            if (event.target.value) {
+                let changeDate: any;
+                if (!this.dateService.validDate(this.dateService.formatDate(this.dateService.doDateFormat(event.target)))) {
+                    changeDate = this.dateService.formatDate(this.dateService.doDateFormat(event.target));
+                    this.occupationalInvalidDate = true;
+                } else {
+                    this.occupationalInvalidDate = false;
+                    changeDate =
+                        this.dateService.assignDate(this.dateService.formatDate(this.dateService.doDateFormat(event.target)));
+
+                }
+                this.medicalForm.patchValue({ 'occupationalTherapyDate': changeDate });
+                if (this.dateService.compareDates(this.dateService.formatDate(this.dateService.doDateFormat(event.target)), today_date)) {
+                    this.occupationalFutureDateFlag = true;
+                } else {
+                    this.occupationalFutureDateFlag = false;
+                }
+            } else {
+                this.medicalForm.patchValue({ 'occupationalTherapyDate': '' });
+            }
+        }
+    }
+    ChangeTherapyDurationDate(event: any) {
+        this.TherapyDurationInvalidDate = false;
+        this.TherapyDurationFutureDateFlag = false;
+        const today_date = this.dateService.today_Date();
+        if (this.medicalForm.value.speechTherapyDate) {
+            if (this.dateService.compareDates(this.medicalForm.value.speechTherapyDate.formatted, today_date)) {
+                this.TherapyDurationFutureDateFlag = true;
+            } else {
+                this.TherapyDurationFutureDateFlag = false;
+            }
+        } else {
+            if (event.target.value) {
+                let changeDate: any;
+                if (!this.dateService.validDate(this.dateService.formatDate(this.dateService.doDateFormat(event.target)))) {
+                    changeDate = this.dateService.formatDate(this.dateService.doDateFormat(event.target));
+                    this.TherapyDurationInvalidDate = true;
+                } else {
+                    this.TherapyDurationInvalidDate = false;
+                    changeDate =
+                        this.dateService.assignDate(this.dateService.formatDate(this.dateService.doDateFormat(event.target)));
+
+                }
+                this.medicalForm.patchValue({ 'speechTherapyDate': changeDate });
+                if (this.dateService.compareDates(this.dateService.formatDate(this.dateService.doDateFormat(event.target)), today_date)) {
+                    this.TherapyDurationFutureDateFlag = true;
+                } else {
+                    this.TherapyDurationFutureDateFlag = false;
+                }
+            } else {
+                this.medicalForm.patchValue({ 'speechTherapyDate': '' });
+            }
+        }
+    }
+    ChangeRespiratoryDate(event: any) {
+        this.RespiratoryInvalidDate = false;
+        this.RespiratoryFutureDateFlag = false;
+        const today_date = this.dateService.today_Date();
+        if (this.medicalForm.value.respiratoryTherapyDate) {
+            if (this.dateService.compareDates(this.medicalForm.value.respiratoryTherapyDate.formatted, today_date)) {
+                this.RespiratoryFutureDateFlag = true;
+            } else {
+                this.RespiratoryFutureDateFlag = false;
+            }
+        } else {
+            if (event.target.value) {
+                let changeDate: any;
+                if (!this.dateService.validDate(this.dateService.formatDate(this.dateService.doDateFormat(event.target)))) {
+                    changeDate = this.dateService.formatDate(this.dateService.doDateFormat(event.target));
+                    this.RespiratoryInvalidDate = true;
+                } else {
+                    this.RespiratoryInvalidDate = false;
+                    changeDate =
+                        this.dateService.assignDate(this.dateService.formatDate(this.dateService.doDateFormat(event.target)));
+
+                }
+                this.medicalForm.patchValue({ 'respiratoryTherapyDate': changeDate });
+                if (this.dateService.compareDates(this.dateService.formatDate(this.dateService.doDateFormat(event.target)), today_date)) {
+                    this.RespiratoryFutureDateFlag = true;
+                } else {
+                    this.RespiratoryFutureDateFlag = false;
+                }
+            } else {
+                this.medicalForm.patchValue({ 'respiratoryTherapyDate': '' });
+            }
+        }
+    }
+}
+
+export class SectionFormControl extends FormControl {
+    public groupName;
+    constructor(val: any, validation: any) {
+        if (validation === true) {
+            super('', [Validators.required]);
+        } else {
+            super('', []);
+        }
+        super.setValue('');
+        this.groupName = val;
+    }
+}
+
+export class Constant {
+    public static SECTION1 = 'section1';
+    public static SECTION2 = 'section2';
+    public static SECTION3 = 'section3';
+    public static SECTION4 = 'section4';
+    public static SECTION5 = 'section5';
+    public static SECTION6 = 'section6';
+}
