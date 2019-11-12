@@ -1,5 +1,7 @@
 Welcome to MyApp
 
+https://bootsnipp.com/snippets/DOeka
+
 https://stackoverflow.com/questions/40567687/angular-2-insert-a-component-into-the-dom-of-another-component
 
 http://plnkr.co/edit/7jJJhkcgqk4YdjFOXTGF?p=preview
