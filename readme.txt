@@ -1,103 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="background-container">
+        <div class="left-background"></div>
+        <div class="right-background"></div>
+    </div>
+    <div class="container">
+        <div class="login-box">
+            <h1>eInvoice</h1>
+            <form>
+                <input type="text" name="username" placeholder="Username" required>
+                <input type="password" name="password" placeholder="Password" required>
+                <button type="submit">LOGIN</button>
+                <a href="#">Forgot Password?</a>
+                <div class="separator-container">
+                    <div class="separator-line"></div>
+                    <div class="separator-circle">OR</div>
+                    <div class="separator-line"></div>
+                </div>
+                <button type="button" class="sso-button">LOGIN WITH SSO</button>
+            </form>
+            <div class="footer">
+                <a href="#">Terms & Conditions</a> - <a href="#">Privacy Policy</a>
+            </div>
+            <div class="powered-by">
+                <span>Powered by</span>
+                <img src="logo.png" alt="Logo">
+            </div>
+        </div>
+    </div>
+</body>
+</html>
 
-import { Component, OnInit } from '@angular/core';
+==========================
 
-@Component({
-  selector: 'app-document-management',
-  templateUrl: './document-management.component.html',
-  styleUrls: ['./document-management.component.css']
-})
-export class DocumentManagementComponent implements OnInit {
-  personalTermsAndConditionFL: any; // Assuming this is the type of your documents
-  personalTermsAndConditionMC: any; // Assuming this is the type of your documents
-  languages: any[] = []; // Assuming this is the type of your languages
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f5f5f5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    overflow: hidden;
+}
 
-  constructor() { }
+.background-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: space-between;
+    z-index: -1;
+}
 
-  ngOnInit(): void {
-    // Fetch documents and languages from API
-    // Replace the following with actual API calls
-    this.fetchDocuments();
-    this.fetchLanguages();
-  }
+.left-background, .right-background {
+    width: 50%;
+    height: 100%;
+    background-size: cover;
+    background-repeat: no-repeat;
+    position: absolute;
+}
 
-  fetchDocuments(): void {
-    // Replace this with your actual API call to fetch documents
-    // For example, you can use this.oldDoc as a mock data for now
-    this.oldDoc = [
-      // Your document data
-    ];
+.left-background {
+    background: url('login-left-img.png') no-repeat center;
+    left: -10%;
+}
 
-    // Update personalTermsAndConditionFL and personalTermsAndConditionMC
-    this.personalTermsAndConditionFL = this.oldDoc.find(doc => doc.documentTypeId === 8 && doc.roleId === 2) || personalTermsAndConditionFL;
-    this.personalTermsAndConditionMC = this.oldDoc.find(doc => doc.documentTypeId === 8 && doc.roleId === 15) || personalTermsAndConditionMC;
-  }
+.right-background {
+    background: url('login-right-img.png') no-repeat center;
+    right: -10%;
+}
 
-  fetchLanguages(): void {
-    // Replace this with your actual API call to fetch languages
-    // For example, you can use this.languages as a mock data for now
-    this.languages = [
-      // Your language data
-    ];
+.container {
+    background: linear-gradient(to bottom right, rgba(50, 168, 82, 0.8), rgba(60, 200, 128, 0.8));
+    border-radius: 8px;
+    padding: 40px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    z-index: 1;
+}
 
-    // Repeat section content and map translations
-    this.repeatSectionContentInAllLanguages();
-    this.mapTranslations();
-  }
+.login-box {
+    background-color: #ffffff;
+    padding: 40px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    text-align: center;
+    width: 100%;
+    max-width: 400px;
+    z-index: 2;
+}
 
-  repeatSectionContentInAllLanguages(): void {
-    // Repeat section content for all available languages
-    [this.personalTermsAndConditionFL, this.personalTermsAndConditionMC].forEach(document => {
-      if (document) {
-        document.sectionContent.forEach(section => {
-          // Create a copy of the section content for each language
-          this.languages.forEach(language => {
-            const translation = this.getTranslation(section, language.languageISOCode);
-            const translatedSection = {
-              sectionId: section.sectionId,
-              id: section.id + 1000, // Dynamic ID for translated section
-              deletedFlag: false,
-              sectionContent: translation || ''
-            };
+.login-box h1 {
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #333;
+}
 
-            // Add translations array to each section
-            section.translations = section.translations || [];
-            section.translations.push({
-              languageISOCode: language.languageISOCode,
-              translationText: translation || '',
-              translatedSection: [translatedSection]
-            });
-          });
-        });
-      }
-    });
-  }
+.login-box input[type="text"],
+.login-box input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
 
-  mapTranslations(): void {
-    // Map translations from the actual response to each section
-    [this.personalTermsAndConditionFL, this.personalTermsAndConditionMC].forEach(document => {
-      if (document) {
-        document.sectionContent.forEach(section => {
-          section.translations.forEach(translation => {
-            const languageIndex = this.languages.findIndex(lang => lang.languageISOCode === translation.languageISOCode);
-            if (languageIndex !== -1) {
-              // Update translationText in the corresponding language
-              section.translations[languageIndex].translationText = translation.translationText;
+.login-box button {
+    width: 100%;
+    padding: 10px;
+    background-color: #007bff;
+    border: none;
+    color: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+}
 
-              // Update translatedSection in the corresponding language
-              const translatedSection = section.translations[languageIndex].translatedSection[0];
-              translatedSection.sectionId = section.sectionId;
-              translatedSection.id = section.id + 1000; // Dynamic ID for translated section
-              translatedSection.deletedFlag = false;
-              translatedSection.sectionContent = translation.translationText;
-            }
-          });
-        });
-      }
-    });
-  }
+.login-box button:hover {
+    background-color: #0056b3;
+}
 
-  getTranslation(section: any, languageISOCode: string): string {
-    const translation = section.translations.find(t => t.languageISOCode === languageISOCode);
-    return translation ? translation.translationText : '';
-  }
+.login-box a {
+    display: block;
+    margin-top: 10px;
+    color: #007bff;
+    text-decoration: none;
+}
+
+.login-box a:hover {
+    text-decoration: underline;
+}
+
+.login-box .sso-button {
+    background-color: #ffffff;
+    color: #007bff;
+    border: 2px solid #007bff;
+    margin-top: 10px;
+}
+
+.login-box .sso-button:hover {
+    background-color: #f5f5f5;
+}
+
+.login-box .footer {
+    margin-top: 20px;
+    font-size: 12px;
+    color: #777;
+}
+
+.login-box .footer a {
+    color: #777;
+    text-decoration: none;
+}
+
+.login-box .footer a:hover {
+    text-decoration: underline;
+}
+
+.login-box .powered-by {
+    margin-top: 30px;
+}
+
+.separator {
+    margin: 20px 0;
+    font-size: 14px;
+    color: #777;
+}
+
+.separator-container {
+    display: flex;
+    align-items: center;
+    margin: 20px 0;
+}
+
+.separator-line {
+    flex: 1;
+    height: 1px;
+    background-color: #ddd;
+}
+
+.separator-circle {
+    width: 40px;
+    height: 40px;
+	border: 1px solid #777;
+    border-radius: 50%;
+    background-color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #777;
+    font-size: 14px;
+    margin: 0 10px;
 }
