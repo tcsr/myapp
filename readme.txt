@@ -1,189 +1,91 @@
-1. Retrieve Table Structure from MySQL
-To get the table structure and details of columns in MySQL, use the following query:
+<!-- custom-spinner.component.html -->
+<div class="custom-loading-container" *ngIf="isLoading">
+  <div class="custom-spinner">
+    <div class="spinner-segment" *ngFor="let segment of segments"></div>
+  </div>
+  <div class="loading-text">{{loadingText}}</div>
+</div>
 
-sql
-Copy code
-SELECT 
-    TABLE_NAME,
-    COLUMN_NAME,
-    COLUMN_TYPE,
-    IS_NULLABLE,
-    COLUMN_KEY,
-    COLUMN_DEFAULT,
-    EXTRA
-FROM 
-    INFORMATION_SCHEMA.COLUMNS
-WHERE 
-    TABLE_SCHEMA = 'your_database_name'
-    AND TABLE_NAME = 'your_table_name';
-Replace 'your_database_name' and 'your_table_name' with your actual database and table names.
 
-This query will provide details such as:
+// custom-spinner.component.ts
+import { Component, Input } from '@angular/core';
 
-TABLE_NAME: The name of the table.
-COLUMN_NAME: The column names in the table.
-COLUMN_TYPE: Data type of each column (e.g., INT, VARCHAR).
-IS_NULLABLE: Indicates if the column can contain NULL values.
-COLUMN_KEY: Shows if the column is a primary key, unique key, etc.
-COLUMN_DEFAULT: Default value of the column.
-EXTRA: Additional information like auto-increment.
-2. Retrieve Table Structure from MSSQL
-In MSSQL, you can use the following query to get the column details:
+@Component({
+  selector: 'app-custom-spinner',
+  templateUrl: './custom-spinner.component.html',
+  styleUrls: ['./custom-spinner.component.css']
+})
+export class CustomSpinnerComponent {
+  @Input() isLoading: boolean = true;  // Show/hide spinner
+  @Input() loadingText: string = 'loading....'; // Custom loading text
+  segments = Array(12).fill(0); // Creating 12 segments for the spinner
+}
 
-sql
-Copy code
-SELECT 
-    TABLE_NAME,
-    COLUMN_NAME,
-    DATA_TYPE,
-    CHARACTER_MAXIMUM_LENGTH,
-    IS_NULLABLE,
-    COLUMN_DEFAULT
-FROM 
-    INFORMATION_SCHEMA.COLUMNS
-WHERE 
-    TABLE_CATALOG = 'your_database_name'
-    AND TABLE_NAME = 'your_table_name';
-Again, replace 'your_database_name' and 'your_table_name' with the appropriate names.
+/* custom-spinner.component.css */
+.custom-loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 2px dashed orange;
+  padding: 20px;
+  margin: 20px;
+  height: 150px;  /* Adjust height */
+  width: 100%;    /* Adjust width */
+}
 
-This query will provide details including:
+.custom-spinner {
+  position: relative;
+  width: 60px;
+  height: 60px;
+  animation: rotate 1s linear infinite;
+}
 
-TABLE_NAME: The name of the table.
-COLUMN_NAME: The column names in the table.
-DATA_TYPE: Data type of each column (e.g., INT, VARCHAR).
-CHARACTER_MAXIMUM_LENGTH: The maximum length of character columns.
-IS_NULLABLE: Indicates if the column can contain NULL values.
-COLUMN_DEFAULT: Default value of the column.
-3. Compare the Results
-Export the results of the above queries to CSV files or use a spreadsheet to compare column names, data types, and other properties side by side.
-Look for differences in data types and nullable properties between MySQL and MSSQL.
-Note down the data type conversions needed, as some MySQL data types may need to be mapped to their equivalent MSSQL types (e.g., VARCHAR in MySQL to NVARCHAR in MSSQL).
-4. Data Type Mapping Considerations
-Here's a basic mapping for some common data types between MySQL and MSSQL:
+.spinner-segment {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: transparent;
+  border-top: 6px solid orange;
+  border-radius: 50%;
+  transform: rotate(calc(30deg * var(--i)));
+  animation: dash 1.2s ease-in-out infinite;
+}
 
-MySQL Data Type	MSSQL Equivalent Data Type
-INT	INT
-BIGINT	BIGINT
-FLOAT	FLOAT
-DOUBLE	FLOAT
-VARCHAR(n)	NVARCHAR(n)
-TEXT	NVARCHAR(MAX)
-DATETIME	DATETIME
-TIMESTAMP	DATETIME2
-BOOLEAN	BIT
-5. Tips for Migration
-Data Type Conversion: Ensure you map MySQL data types to their closest equivalents in MSSQL.
-Primary Keys and Indexes: Verify that primary keys, foreign keys, and indexes are correctly created in the MSSQL database.
-Handle Auto-Increment: MySQL uses AUTO_INCREMENT for primary keys, while MSSQL uses IDENTITY. Ensure this is correctly set up in the MSSQL schema.
-Use Migration Tools: Consider using tools like SQL Server Migration Assistant (SSMA) for MySQL or third-party ETL tools for automated migration and schema comparison.
-Test with Sample Data: Before migrating the entire database, test the migration process with a subset of data to identify potential issues.
-Data Integrity: After migration, run queries to validate row counts and check for data integrity issues between MySQL and MSSQL.
-With these steps and queries, you can perform a thorough analysis and mapping for the migration process. If you need assistance with a specific part of the migration, feel free to ask!
-========================
+.spinner-segment:nth-child(1) { --i: 1; transform: rotate(0deg); }
+.spinner-segment:nth-child(2) { --i: 2; transform: rotate(30deg); }
+.spinner-segment:nth-child(3) { --i: 3; transform: rotate(60deg); }
+.spinner-segment:nth-child(4) { --i: 4; transform: rotate(90deg); }
+.spinner-segment:nth-child(5) { --i: 5; transform: rotate(120deg); }
+.spinner-segment:nth-child(6) { --i: 6; transform: rotate(150deg); }
+.spinner-segment:nth-child(7) { --i: 7; transform: rotate(180deg); }
+.spinner-segment:nth-child(8) { --i: 8; transform: rotate(210deg); }
+.spinner-segment:nth-child(9) { --i: 9; transform: rotate(240deg); }
+.spinner-segment:nth-child(10) { --i: 10; transform: rotate(270deg); }
+.spinner-segment:nth-child(11) { --i: 11; transform: rotate(300deg); }
+.spinner-segment:nth-child(12) { --i: 12; transform: rotate(330deg); }
 
-1. Retrieve Column Information from Both Tables
-First, extract the column information from both the MySQL and MSSQL tables into a common format, then compare these structures.
+@keyframes rotate {
+  100% {
+    transform: rotate(360deg);
+  }
+}
 
-1.1 Extract MSSQL Table Structure
-Run this query in MSSQL to get the column details:
- 
-SELECT 
-    COLUMN_NAME,
-    DATA_TYPE,
-    CHARACTER_MAXIMUM_LENGTH,
-    IS_NULLABLE
-FROM 
-    INFORMATION_SCHEMA.COLUMNS
-WHERE 
-    TABLE_CATALOG = 'your_mssql_database_name'
-    AND TABLE_NAME = 'your_mssql_table_name';
+@keyframes dash {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
 
-1.2 Extract MySQL Table Structure
-Run this query in MySQL to get the column details:
+.loading-text {
+  margin-left: 15px;
+  font-size: 16px;
+  color: #333;
+}
 
-SELECT 
-    COLUMN_NAME,
-    COLUMN_TYPE,
-    IS_NULLABLE
-FROM 
-    INFORMATION_SCHEMA.COLUMNS
-WHERE 
-    TABLE_SCHEMA = 'your_mysql_database_name'
-    AND TABLE_NAME = 'your_mysql_table_name';
-
-2. Export the Data to CSV for Comparison
-Run the above queries and export the results to CSV files from both databases. You can then import these files into a spreadsheet or use a script to perform a comparison.
-
-3. Compare the Tables in SQL or with a Script
-3.1 Using SQL for Comparison (MSSQL Approach)
-If you have access to an MSSQL instance, you can create a temporary table to store the MySQL column information and compare it directly in MSSQL.
-
-1.Create a temporary table in MSSQL to store MySQL column details:
-
-CREATE TABLE #MySQLTableStructure (
-    COLUMN_NAME NVARCHAR(128),
-    DATA_TYPE NVARCHAR(128),
-    IS_NULLABLE NVARCHAR(3)
-);
-
-2. Insert the MySQL column details into the temporary table (use the data retrieved earlier).
-
-3. Compare columns between MSSQL and MySQL:
-
--- Find columns in MSSQL that are not in MySQL
-SELECT 
-    COLUMN_NAME, 
-    DATA_TYPE, 
-    IS_NULLABLE 
-FROM 
-    INFORMATION_SCHEMA.COLUMNS
-WHERE 
-    TABLE_CATALOG = 'your_mssql_database_name'
-    AND TABLE_NAME = 'your_mssql_table_name'
-    AND COLUMN_NAME NOT IN (SELECT COLUMN_NAME FROM #MySQLTableStructure);
-
--- Find columns in MySQL that are not in MSSQL
-SELECT 
-    COLUMN_NAME, 
-    DATA_TYPE, 
-    IS_NULLABLE 
-FROM 
-    #MySQLTableStructure
-WHERE 
-    COLUMN_NAME NOT IN (
-        SELECT COLUMN_NAME 
-        FROM INFORMATION_SCHEMA.COLUMNS 
-        WHERE TABLE_CATALOG = 'your_mssql_database_name' AND TABLE_NAME = 'your_mssql_table_name'
-    );
-
-3.2 Using Python for Field-Level Comparison
-Alternatively, you can write a Python script to perform the comparison if you prefer automation and have exported the data to CSV files.
-
-Here’s a sample Python script for comparing the columns:
-
-import pandas as pd
-
-# Load MSSQL and MySQL column details from CSV files
-mssql_df = pd.read_csv('mssql_columns.csv')
-mysql_df = pd.read_csv('mysql_columns.csv')
-
-# Find columns in MSSQL that are not in MySQL
-mssql_only = mssql_df[~mssql_df['COLUMN_NAME'].isin(mysql_df['COLUMN_NAME'])]
-print("Columns in MSSQL but not in MySQL:")
-print(mssql_only)
-
-# Find columns in MySQL that are not in MSSQL
-mysql_only = mysql_df[~mysql_df['COLUMN_NAME'].isin(mssql_df['COLUMN_NAME'])]
-print("\nColumns in MySQL but not in MSSQL:")
-print(mysql_only)
-
-4. Review the Results
-The SQL queries will show you columns that exist in one table but not in the other.
-If using the Python script, you'll get a list of columns that are unique to each table.
-Additional Tips
-Automated Comparison Tools: Consider using database comparison tools like Redgate's SQL Compare or dbForge Studio, which provide visual interfaces to compare schema differences.
-Data Type Differences: While comparing, also check for differences in data types and nullability.
-Synchronization: Once differences are identified, you can decide which columns need to be added, removed, or modified in the target table (MSSQL).
-This approach will help you get a clear picture of the differences in column structures between the MySQL and MSSQL tables.
+<!-- Component where you want to use it) -->
+<app-custom-spinner [isLoading]="true" loadingText="Loading your data..."></app-custom-spinner>
 
 
