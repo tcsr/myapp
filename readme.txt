@@ -1,91 +1,157 @@
-<!-- custom-spinner.component.html -->
-<div class="custom-loading-container" *ngIf="isLoading">
-  <div class="custom-spinner">
-    <div class="spinner-segment" *ngFor="let segment of segments"></div>
+ng generate component custom-scrollbar
+
+<!-- custom-scrollbar.component.html -->
+<div class="custom-scrollbar-container" 
+     [ngStyle]="{'height': height, 'width': width}"
+     (mouseenter)="onHover(true)" 
+     (mouseleave)="onHover(false)">
+  <div class="scrollbar-track" #scrollContainer (scroll)="onScroll($event)">
+    <div class="scrollbar-content">
+      <ng-content></ng-content>
+    </div>
   </div>
-  <div class="loading-text">{{loadingText}}</div>
 </div>
 
-
-// custom-spinner.component.ts
-import { Component, Input } from '@angular/core';
+// custom-scrollbar.component.ts
+import {
+  Component,
+  Input,
+  ElementRef,
+  ViewChild,
+  AfterViewInit,
+  HostListener
+} from '@angular/core';
 
 @Component({
-  selector: 'app-custom-spinner',
-  templateUrl: './custom-spinner.component.html',
-  styleUrls: ['./custom-spinner.component.css']
+  selector: 'app-custom-scrollbar',
+  templateUrl: './custom-scrollbar.component.html',
+  styleUrls: ['./custom-scrollbar.component.css']
 })
-export class CustomSpinnerComponent {
-  @Input() isLoading: boolean = true;  // Show/hide spinner
-  @Input() loadingText: string = 'loading....'; // Custom loading text
-  segments = Array(12).fill(0); // Creating 12 segments for the spinner
+export class CustomScrollbarComponent implements AfterViewInit {
+  @Input() height: string = '300px'; // Customizable height
+  @Input() width: string = '100%';   // Customizable width
+  @Input() scrollbarColor: string = '#888'; // Scrollbar color
+  @Input() scrollbarWidth: string = '6px';  // Scrollbar width
+  @Input() visibility: 'hover' | 'always' | 'hidden' = 'hover'; // Visibility control
+  @Input() smoothScrolling: boolean = true; // Smooth scrolling toggle
+
+  @ViewChild('scrollContainer', { static: true }) scrollContainer!: ElementRef;
+
+  ngAfterViewInit(): void {
+    this.applyCustomStyles();
+    if (this.smoothScrolling) {
+      this.scrollContainer.nativeElement.style.scrollBehavior = 'smooth';
+    }
+  }
+
+  applyCustomStyles(): void {
+    const container = this.scrollContainer.nativeElement;
+    container.style.overflowY = 'auto';
+    container.style.overflowX = 'auto';
+
+    if (this.visibility === 'hidden') {
+      container.style.overflow = 'hidden';
+    } else if (this.visibility === 'hover') {
+      container.style.overflow = 'hidden';
+    } else if (this.visibility === 'always') {
+      container.style.overflow = 'auto';
+    }
+  }
+
+  onHover(isHovered: boolean): void {
+    if (this.visibility === 'hover') {
+      this.scrollContainer.nativeElement.style.overflow = isHovered ? 'auto' : 'hidden';
+    }
+  }
+
+  onScroll(event: Event): void {
+    // Handle scroll event here, for example, to notify external listeners
+    console.log('Scroll position:', this.scrollContainer.nativeElement.scrollTop);
+  }
+
+  scrollToTop(): void {
+    this.scrollContainer.nativeElement.scrollTop = 0;
+  }
+
+  scrollToBottom(): void {
+    this.scrollContainer.nativeElement.scrollTop = this.scrollContainer.nativeElement.scrollHeight;
+  }
+
+  scrollToLeft(): void {
+    this.scrollContainer.nativeElement.scrollLeft = 0;
+  }
+
+  scrollToRight(): void {
+    this.scrollContainer.nativeElement.scrollLeft = this.scrollContainer.nativeElement.scrollWidth;
+  }
 }
 
-/* custom-spinner.component.css */
-.custom-loading-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border: 2px dashed orange;
-  padding: 20px;
-  margin: 20px;
-  height: 150px;  /* Adjust height */
-  width: 100%;    /* Adjust width */
-}
-
-.custom-spinner {
+/* custom-scrollbar.component.css */
+.custom-scrollbar-container {
   position: relative;
-  width: 60px;
-  height: 60px;
-  animation: rotate 1s linear infinite;
+  overflow: hidden; /* Prevent native scrollbars */
+  border: 1px solid #ddd;
+  background-color: #f9f9f9;
+  height: 100%;
+  width: 100%;
 }
 
-.spinner-segment {
-  position: absolute;
+.scrollbar-track {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+.scrollbar-content {
   width: 100%;
   height: 100%;
+  overflow: auto;
+}
+
+.scrollbar-content::-webkit-scrollbar {
+  width: var(--scrollbar-width, 6px);
+  height: var(--scrollbar-width, 6px);
+}
+
+.scrollbar-content::-webkit-scrollbar-thumb {
+  background-color: var(--scrollbar-color, #888);
+  border-radius: 4px;
+}
+
+.scrollbar-content::-webkit-scrollbar-track {
   background-color: transparent;
-  border-top: 6px solid orange;
-  border-radius: 50%;
-  transform: rotate(calc(30deg * var(--i)));
-  animation: dash 1.2s ease-in-out infinite;
 }
 
-.spinner-segment:nth-child(1) { --i: 1; transform: rotate(0deg); }
-.spinner-segment:nth-child(2) { --i: 2; transform: rotate(30deg); }
-.spinner-segment:nth-child(3) { --i: 3; transform: rotate(60deg); }
-.spinner-segment:nth-child(4) { --i: 4; transform: rotate(90deg); }
-.spinner-segment:nth-child(5) { --i: 5; transform: rotate(120deg); }
-.spinner-segment:nth-child(6) { --i: 6; transform: rotate(150deg); }
-.spinner-segment:nth-child(7) { --i: 7; transform: rotate(180deg); }
-.spinner-segment:nth-child(8) { --i: 8; transform: rotate(210deg); }
-.spinner-segment:nth-child(9) { --i: 9; transform: rotate(240deg); }
-.spinner-segment:nth-child(10) { --i: 10; transform: rotate(270deg); }
-.spinner-segment:nth-child(11) { --i: 11; transform: rotate(300deg); }
-.spinner-segment:nth-child(12) { --i: 12; transform: rotate(330deg); }
-
-@keyframes rotate {
-  100% {
-    transform: rotate(360deg);
-  }
+.custom-scrollbar-container:hover .scrollbar-content {
+  overflow: auto; /* Display the scrollbar on hover */
 }
 
-@keyframes dash {
-  0% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-  }
+.custom-scrollbar-container .scrollbar-content {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-color, #888) transparent;
+  transition: opacity 0.3s;
 }
 
-.loading-text {
-  margin-left: 15px;
-  font-size: 16px;
-  color: #333;
+.custom-scrollbar-container:hover .scrollbar-content::-webkit-scrollbar-thumb {
+  background-color: #555; /* Change color on hover */
 }
 
-<!-- Component where you want to use it) -->
-<app-custom-spinner [isLoading]="true" loadingText="Loading your data..."></app-custom-spinner>
+:host-context(.smooth) .scrollbar-content {
+  scroll-behavior: smooth;
+}
 
 
+<!-- app.component.html or any other component -->
+<app-custom-scrollbar 
+  [height]="'400px'" 
+  [width]="'300px'"
+  [scrollbarColor]="'#FF5733'" 
+  [scrollbarWidth]="'8px'" 
+  [visibility]="'hover'"
+  [smoothScrolling]="true">
+  
+  <!-- Scrollable content goes here -->
+  <div *ngFor="let item of items" style="padding: 10px; border-bottom: 1px solid #ddd;">
+    Item {{ item }}
+  </div>
+</app-custom-scrollbar>
